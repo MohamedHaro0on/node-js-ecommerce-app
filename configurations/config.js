@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const connectDB = () => {
+const DBconnection = () => {
   try {
     mongoose
       .connect(process.env.DB_URI)
@@ -17,4 +17,4 @@ const connectDB = () => {
   }
 };
 
-export default connectDB;
+export default DBconnection;

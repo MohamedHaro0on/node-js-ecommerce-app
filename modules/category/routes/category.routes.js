@@ -7,14 +7,35 @@ import {
   deleteCategory,
 } from "../controller/category.controller.js";
 import paginate from "../../../middleswares/pagination.js";
-import CategoryModel from "../model/category.model.js";
+import validateRequest from "../../../middleswares/validate.request.js";
+import {
+  createCategorySchema,
+  deleteCategorySchema,
+  editCategorySchema,
+  getCategorySchema,
+} from "../joi/category.joi.js";
 
-const categroryRouter = express.Router();
+const categoryRouter = express.Router();
 
-categroryRouter.post("/create-category", createCategory);
-categroryRouter.get("/get-categories", paginate, getCategories);
-categroryRouter.get("/get-category", getCategory);
-categroryRouter.put("/update-category", updateCategory);
-categroryRouter.delete("/delete-category", deleteCategory);
-// categroryRouter.route("/").get(getCategory).post(createCategory)
-export default categroryRouter;
+categoryRouter.post(
+  "/create-category",
+  validateRequest(createCategorySchema),
+  createCategory
+);
+categoryRouter.get("/get-categories", paginate, getCategories);
+categoryRouter.get(
+  "/get-category",
+  validateRequest(getCategorySchema),
+  getCategory
+);
+categoryRouter.put(
+  "/update-category",
+  validateRequest(editCategorySchema),
+  updateCategory
+);
+categoryRouter.delete(
+  "/delete-category",
+  validateRequest(deleteCategorySchema),
+  deleteCategory
+);
+export default categoryRouter;
