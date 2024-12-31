@@ -41,20 +41,36 @@ export const getCategories = expressAsyncHandler(async (req, res, next) => {
   });
 });
 
-// @desc      get specfic category              GET Category by name and by id ;
+// @desc      get specfic category  by Name ;
 // @route     GET /get-category
 // @access    public
 
-export const getCategory = expressAsyncHandler(async (req, res, next) => {
+export const getCategoryByName = expressAsyncHandler(async (req, res, next) => {
   const { name } = req.body;
+  let category = null;
+
+  if (name) category = await CategoryModel.find({ name });
+
+  // if Category was found :
+  if (category) {
+    res.status(StatusCodes.OK).json({
+      message: "Successfll",
+      category,
+    });
+  }
+  // if Category is not found :
+  return next(new ApiError("Category is not found", StatusCodes.NOT_FOUND));
+});
+
+// @desc      get specfic category by ID  ;
+// @route     GET /get-category
+// @access    public
+
+export const getCategoryById = expressAsyncHandler(async (req, res, next) => {
   const { id } = req.query;
   let category = null;
 
-  name ? (category = await CategoryModel.find({ name })) : null;
-
-  id && isValidObjectId(id)
-    ? (category = await CategoryModel.findOne({ _id: id }))
-    : null;
+  if (isValidObjectId(id)) category = await CategoryModel.findOne({ _id: id });
 
   // if Category was found :
   if (category) {
@@ -73,17 +89,20 @@ export const getCategory = expressAsyncHandler(async (req, res, next) => {
 
 export const updateCategory = expressAsyncHandler(async (req, res, next) => {
   const { name, id } = req.body;
-  const category = await CategoryModel.findByIdAndUpdate(
-    { _id: id },
-    { name, slug: slugify(name) },
-    { new: true }
-  );
-  if (category) {
-    res.status(StatusCodes.ACCEPTED).json({
-      message: "Succesfull",
-      category,
-    });
+  if (isValidObjectId(id)) {
+    const category = await CategoryModel.findByIdAndUpdate(
+      { _id: id },
+      { name, slug: slugify(name) },
+      { new: true }
+    );
+    if (category) {
+      res.status(StatusCodes.ACCEPTED).json({
+        message: "Succesfull",
+        category,
+      });
+    }
   }
+  // handles both if the id is not a valid object + if the category id is not found ;
   return next(new ApiError("Category is not found", StatusCodes.NOT_FOUND));
 });
 
@@ -93,13 +112,16 @@ export const updateCategory = expressAsyncHandler(async (req, res, next) => {
 
 export const deleteCategory = expressAsyncHandler(async (req, res, next) => {
   const { id } = req.query;
-  const deletedCategory =
-    isValidObjectId(id) && (await CategoryModel.findByIdAndDelete({ _id: id }));
-  if (deletedCategory) {
-    res.status(StatusCodes.OK).json({
-      message: "Categoy Found and was Deleted",
-      deletedCategory,
-    });
+
+  if (isValidObjectId(id)) {
+    const deletedCategory = await CategoryModel.findByIdAndDelete({ _id: id });
+    if (deletedCategory) {
+      res.status(StatusCodes.OK).json({
+        message: "Categoy Found and was Deleted",
+        deletedCategory,
+      });
+    }
   }
+  // handles both if the id is not a valid object + if the category is not found ;
   return next(new ApiError("Category is not found", StatusCodes.NOT_FOUND));
 });
