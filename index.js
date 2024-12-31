@@ -6,6 +6,7 @@ import categoryRouter from "./modules/category/routes/category.routes.js";
 import ProductRoutes from "./modules/product/routes/product.routes.js";
 import errorHandler from "./handlers/error.handler.js";
 import routeNotImplementedHandler from "./handlers/notImplementedRoute.handler.js";
+import SubCategoryRoutes from "./modules/subcategory/routes/subCategory.routes.js";
 
 const app = express();
 
@@ -25,7 +26,7 @@ if (process.env.NODE_ENV === "development") {
 // Routes :
 app.use(categoryRouter);
 app.use(ProductRoutes);
-
+app.use(SubCategoryRoutes);
 // Not implemented Errors :
 app.all("*", routeNotImplementedHandler);
 // Global error handling middleware for express ;

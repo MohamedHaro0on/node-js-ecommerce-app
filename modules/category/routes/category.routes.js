@@ -18,30 +18,42 @@ import {
 
 const categoryRouter = express.Router();
 
+// Create New Category
 categoryRouter.post(
   "/create-category",
   validateRequest(createCategorySchema),
   createCategory
 );
+
+// Get All Categories
 categoryRouter.get("/get-categories", paginate, getCategories);
+
+// Get Specfic Category By Name ;
 categoryRouter.get(
   "/get-category",
   validateRequest(getCategorySchema),
   getCategoryByName
 );
+
+// Get Specfic Category by Id
 categoryRouter.get(
   "/get-category/:id",
   validateRequest(getCategorySchema),
   getCategoryById
 );
+
+// Update Category ;
 categoryRouter.put(
   "/update-category",
   validateRequest(editCategorySchema),
   updateCategory
 );
+
+// Delete Category ;
 categoryRouter.delete(
   "/delete-category",
   validateRequest(deleteCategorySchema),
   deleteCategory
 );
+
 export default categoryRouter;

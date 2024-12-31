@@ -1,13 +1,13 @@
 import expressAsyncHandler from "express-async-handler";
-import CategoryModel from "../model/category.model.js";
 import { StatusCodes } from "http-status-codes";
 import slugify from "slugify";
 import { isValidObjectId } from "mongoose";
+import CategoryModel from "../model/category.model.js";
 import ApiError from "../../../utils/api.error.js";
 
-// @desc      Create Category
-// @route     POST  /create-category
-// @access    private
+//          @desc                    Create Category
+//          @route                   POST  /create-category
+//          @access                  private
 
 export const createCategory = expressAsyncHandler(async (req, res) => {
   const { name } = req.body;
@@ -22,9 +22,9 @@ export const createCategory = expressAsyncHandler(async (req, res) => {
   });
 });
 
-// @desc      Get Categories
-// @route     GET   /get-categories
-// @access        public
+//          @desc                    Get Categories
+//          @route                   GET   /get-categories
+//          @access                      public
 
 export const getCategories = expressAsyncHandler(async (req, res, next) => {
   const categories = await CategoryModel.find({})
@@ -41,9 +41,9 @@ export const getCategories = expressAsyncHandler(async (req, res, next) => {
   });
 });
 
-// @desc      get specfic category  by Name ;
-// @route     GET /get-category
-// @access    public
+//          @desc                    get specfic category  by Name ;
+//          @route                   GET /get-category
+//          @access                  public
 
 export const getCategoryByName = expressAsyncHandler(async (req, res, next) => {
   const { name } = req.body;
@@ -51,20 +51,20 @@ export const getCategoryByName = expressAsyncHandler(async (req, res, next) => {
 
   if (name) category = await CategoryModel.find({ name });
 
-  // if Category was found :
+  //if Category was found :
   if (category) {
     res.status(StatusCodes.OK).json({
       message: "Successfll",
       category,
     });
   }
-  // if Category is not found :
+  //if Category is not found :
   return next(new ApiError("Category is not found", StatusCodes.NOT_FOUND));
 });
 
-// @desc      get specfic category by ID  ;
-// @route     GET /get-category
-// @access    public
+//          @desc                    get specfic category by ID  ;
+//          @route                   GET /get-category
+//          @access                  public
 
 export const getCategoryById = expressAsyncHandler(async (req, res, next) => {
   const { id } = req.query;
@@ -72,20 +72,20 @@ export const getCategoryById = expressAsyncHandler(async (req, res, next) => {
 
   if (isValidObjectId(id)) category = await CategoryModel.findOne({ _id: id });
 
-  // if Category was found :
+  //if Category was not found :
   if (category) {
     res.status(StatusCodes.OK).json({
       message: "Successfll",
       category,
     });
   }
-  // if Category is not found :
+  //if Category is not found :
   return next(new ApiError("Category is not found", StatusCodes.NOT_FOUND));
 });
 
-// @desc          Update specfic Category
-// @route         PUT         /update-category
-// @access        Private
+//          @desc                        Update specfic Category
+//          @route                       PUT         /update-category
+//          @access                      Private
 
 export const updateCategory = expressAsyncHandler(async (req, res, next) => {
   const { name, id } = req.body;
@@ -106,9 +106,9 @@ export const updateCategory = expressAsyncHandler(async (req, res, next) => {
   return next(new ApiError("Category is not found", StatusCodes.NOT_FOUND));
 });
 
-// @desc          Delete specfic Category
-// @route         Delete         /update-category
-// @access        Private
+//          @desc                        Delete specfic Category
+//          @route                       Delete         /update-category
+//          @access                      Private
 
 export const deleteCategory = expressAsyncHandler(async (req, res, next) => {
   const { id } = req.query;
@@ -122,6 +122,6 @@ export const deleteCategory = expressAsyncHandler(async (req, res, next) => {
       });
     }
   }
-  // handles both if the id is not a valid object + if the category is not found ;
+  // handles both if the id is not a valid object + if the category id is not found ;
   return next(new ApiError("Category is not found", StatusCodes.NOT_FOUND));
 });

@@ -26,6 +26,7 @@ export const deleteCategorySchema = {
 };
 export const getCategorySchema = {
   parms: Joi.object().required().keys({
-    id: Joi.string().required(),
+    id: Joi.string(),
+    name: Joi.string(),
   }),
 };
