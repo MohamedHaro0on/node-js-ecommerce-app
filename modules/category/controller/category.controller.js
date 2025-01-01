@@ -1,7 +1,7 @@
 import expressAsyncHandler from "express-async-handler";
 import { StatusCodes } from "http-status-codes";
 import slugify from "slugify";
-import { isValidObjectId } from "mongoose";
+import mongoose from "mongoose";
 import CategoryModel from "../model/category.model.js";
 import ApiError from "../../../utils/api.error.js";
 
@@ -18,7 +18,7 @@ export const createCategory = expressAsyncHandler(async (req, res) => {
   });
   res.status(StatusCodes.CREATED).json({
     message: "Success",
-    newCategory,
+    data: newCategory,
   });
 });
 
@@ -33,11 +33,11 @@ export const getCategories = expressAsyncHandler(async (req, res, next) => {
   if (!categories) {
     next(new ApiError("Categories is Empty", StatusCodes.NO_CONTENT));
   }
-  res.status(StatusCodes.ACCEPTED).json({
+  res.status(StatusCodes.OK).json({
     message: "Successfull",
     page: req.pagination.page,
     limit: req.pagination.limit,
-    categories,
+    data: categories,
   });
 });
 
@@ -55,7 +55,7 @@ export const getCategoryByName = expressAsyncHandler(async (req, res, next) => {
   if (category) {
     res.status(StatusCodes.OK).json({
       message: "Successfll",
-      category,
+      data: category,
     });
   }
   //if Category is not found :
@@ -67,16 +67,32 @@ export const getCategoryByName = expressAsyncHandler(async (req, res, next) => {
 //          @access                  public
 
 export const getCategoryById = expressAsyncHandler(async (req, res, next) => {
-  const { id } = req.query;
-  let category = null;
-
-  if (isValidObjectId(id)) category = await CategoryModel.findOne({ _id: id });
+  const { id } = req.params;
+  let category = await CategoryModel.aggregate([
+    {
+      $match: { _id: new mongoose.Types.ObjectId(id) }, // Use 'new' keyword
+    },
+    {
+      $lookup: {
+        from: "subcategories", // Collection name for SubCategoryModel
+        localField: "_id",
+        foreignField: "category",
+        as: "subCategories",
+      },
+    },
+    {
+      $project: {
+        name: 1, // Include the category name
+        subCategories: 1, // Include the populated sub-categories
+      },
+    },
+  ]);
 
   //if Category was not found :
   if (category) {
     res.status(StatusCodes.OK).json({
       message: "Successfll",
-      category,
+      data: category,
     });
   }
   //if Category is not found :
@@ -89,20 +105,18 @@ export const getCategoryById = expressAsyncHandler(async (req, res, next) => {
 
 export const updateCategory = expressAsyncHandler(async (req, res, next) => {
   const { name, id } = req.body;
-  if (isValidObjectId(id)) {
-    const category = await CategoryModel.findByIdAndUpdate(
-      { _id: id },
-      { name, slug: slugify(name) },
-      { new: true }
-    );
-    if (category) {
-      res.status(StatusCodes.ACCEPTED).json({
-        message: "Succesfull",
-        category,
-      });
-    }
+  const category = await CategoryModel.findByIdAndUpdate(
+    { _id: id },
+    { name, slug: slugify(name) },
+    { new: true }
+  );
+  if (category) {
+    res.status(StatusCodes.ACCEPTED).json({
+      message: "Succesfull",
+      data: category,
+    });
   }
-  // handles both if the id is not a valid object + if the category id is not found ;
+  // handles if the category id is not found ;
   return next(new ApiError("Category is not found", StatusCodes.NOT_FOUND));
 });
 
@@ -113,15 +127,13 @@ export const updateCategory = expressAsyncHandler(async (req, res, next) => {
 export const deleteCategory = expressAsyncHandler(async (req, res, next) => {
   const { id } = req.query;
 
-  if (isValidObjectId(id)) {
-    const deletedCategory = await CategoryModel.findByIdAndDelete({ _id: id });
-    if (deletedCategory) {
-      res.status(StatusCodes.OK).json({
-        message: "Categoy Found and was Deleted",
-        deletedCategory,
-      });
-    }
+  const deletedCategory = await CategoryModel.findByIdAndDelete(id);
+  if (deletedCategory) {
+    res.status(StatusCodes.OK).json({
+      message: "Categoy Found and was Deleted",
+      data: deletedCategory,
+    });
   }
-  // handles both if the id is not a valid object + if the category id is not found ;
+  // handles if the category id is not found ;
   return next(new ApiError("Category is not found", StatusCodes.NOT_FOUND));
 });
