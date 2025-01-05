@@ -3,9 +3,6 @@ import { StatusCodes } from "http-status-codes";
 import SubCategoryModel from "../model/subCategory.model.js";
 import slugify from "slugify";
 import ApiError from "../../../utils/api.error.js";
-import CategoryModel from "../../category/model/category.model.js";
-import { getCategoryHelperFunction } from "../../category/controller/category.controller.js";
-import mongoose from "mongoose";
 
 //          @desc                    get  subcategories ;
 //          @route                   get /subcategories/
@@ -14,6 +11,7 @@ export const getSubCategories = asyncHandler(async (req, res) => {
   const subcategories = await SubCategoryModel.find({})
     .skip(req.skip)
     .limit(req.limit);
+  // .populate({ path: "mainCategoryId", select: "name -_id" });
   res.status(StatusCodes.OK).json({
     message: "Sub Categories Fetched Successfully",
     data: subcategories,
@@ -24,9 +22,9 @@ export const getSubCategories = asyncHandler(async (req, res) => {
 //          @access                  public
 export const getSubCategotyById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const subCategory = await SubCategoryModel.findOne({ _id: id }).populate(
-    "mainCategoryId"
-  );
+  const subCategory = await SubCategoryModel.findOne({ _id: id })
+    // .populate("mainCategoryId")
+    .populate({ path: "mainCategoryId", select: "name -_id" });
   res.status(StatusCodes.OK).json({
     message: "Sub Category Fetched Successfully",
     data: subCategory,
@@ -47,7 +45,6 @@ export const createSubCategory = asyncHandler(async (req, res, next) => {
     name,
     mainCategoryId,
   });
-
   // if exists don't create ;
   if (existingSubCategory) {
     return next(

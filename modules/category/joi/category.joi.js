@@ -54,7 +54,7 @@ export const getCategorySchema = {
     .required()
     .keys({
       id: objectId().messages({
-        "string.base": "Category ID must be a string",
+        "string.base": "Category ID must be a an object Id",
         "string.empty": "Category ID is required",
         "any.required": "Category ID is required",
         "string.pattern.name": "Category ID must be a valid MongoDB ObjectId",

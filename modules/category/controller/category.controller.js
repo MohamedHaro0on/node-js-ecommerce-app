@@ -54,7 +54,7 @@ export const getCategory = expressAsyncHandler(async (req, res, next) => {
   const { name, id } = req.query;
   let category = null;
   if (id) {
-    category = await await getCategoryHelperFunction(
+    category = await getCategoryHelperFunction(
       "_id",
       new mongoose.Types.ObjectId(id)
     );
@@ -115,7 +115,6 @@ export const deleteCategory = expressAsyncHandler(async (req, res, next) => {
 /// HELPER FUNCTIONS :
 
 export const getCategoryHelperFunction = async (searchTerm, value) => {
-  console.log("this is the search Term ", searchTerm, value);
   let category = await CategoryModel.aggregate([
     {
       $match: { [searchTerm]: value }, // Use 'new' keyword
@@ -135,5 +134,6 @@ export const getCategoryHelperFunction = async (searchTerm, value) => {
       },
     },
   ]);
+  // category = CategoryModel.find({})
   return category;
 };
