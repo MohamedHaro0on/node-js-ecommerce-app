@@ -12,6 +12,7 @@ import {
   createSubCategotySchema,
   editSubCategorySchema,
   getSubCategotyByIdSchema,
+  deleteSubCategotySchema,
 } from "../joi/subCategory.joi.js";
 import SubCategoryModel from "../model/subCategory.model.js";
 import checkIfExists from "../../../middleswares/check.if.exists.js";
@@ -30,7 +31,7 @@ SubCategoryRoutes.put(
   "/edit-subcategory",
   validateRequest(editSubCategorySchema),
   checkIfExists(CategoryModel, "categoryId", "_id", true),
-  checkIfExists(SubCategoryModel, "subCategoryId", "_id", false),
+  checkIfExists(SubCategoryModel, "subCategoryId", "_id", true),
   editSubCategory
 );
 SubCategoryRoutes.get("/get-subcategories", paginate, getSubCategories);
@@ -41,5 +42,10 @@ SubCategoryRoutes.get(
   getSubCategotyById
 );
 
-SubCategoryRoutes.delete("/delete-subcategory/:id", deleteSubCategory);
+SubCategoryRoutes.delete(
+  "/delete-subcategory/:id",
+  validateRequest(deleteSubCategotySchema),
+  checkIfExists(SubCategoryModel, "id", "_id", true),
+  deleteSubCategory
+);
 export default SubCategoryRoutes;

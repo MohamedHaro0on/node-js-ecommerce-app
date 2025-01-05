@@ -75,23 +75,48 @@ export const createSubCategory = asyncHandler(async (req, res, next) => {
 //          @route                   edit /subcategories/edit
 //          @access                  private
 export const editSubCategory = asyncHandler(async (req, res, next) => {
-  const { name, subCategoryId, categoryId } = req;
-  const newSubCategory = await SubCategoryModel.findByIdAndUpdate(
-    { _id: subCategoryId },
+  const { name, subCategoryId, categoryId } = req.body;
+  // edit only if the sub category doesn't exist in the same category ;
+  // Check if a subcategory with the same name already exists in the same main category
+  const existingSubCategory = await SubCategoryModel.findOne({
+    name,
+    mainCategoryId: categoryId,
+    _id: { $ne: subCategoryId }, // Exclude the current subcategory being edited
+  });
+
+  if (existingSubCategory) {
+    return next(
+      new ApiError(
+        "A subcategory with this name already exists in the same main category.",
+        StatusCodes.CONFLICT
+      )
+    );
+  }
+
+  // If no duplicate exists, proceed with the update
+  const updatedSubCategory = await SubCategoryModel.findByIdAndUpdate(
+    subCategoryId,
     {
       name,
       slug: slugify(name),
       mainCategoryId: categoryId,
-    }
+    },
+    { new: true } // Return the updated document
   );
-  if (newSubCategory) {
-    res.status(StatusCodes.CREATED).json({
-      message: "Sub Category is Created Edited Successfully",
-      data: newSubCategory,
+
+  if (updatedSubCategory) {
+    return res.status(StatusCodes.OK).json({
+      message: "Subcategory updated successfully",
+      data: updatedSubCategory,
     });
   }
+
+  // If no subcategory was found to update
   return next(
-    new ApiError("Couldn't Find the Category", StatusCodes.NO_CONTENT)
+    new ApiError(
+      "Subcategory not found or could not be updated.",
+      StatusCodes.NOT_FOUND
+    )
   );
 });
 
@@ -99,7 +124,7 @@ export const editSubCategory = asyncHandler(async (req, res, next) => {
 //          @route                   delete /delete-subcategory
 //          @access                  private
 export const deleteSubCategory = asyncHandler(async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.params;
   const deletedSubCategory = await SubCategoryModel.findByIdAndDelete(id);
   res.status(StatusCodes.OK).json({
     message: "Sub Category is deleted ",

@@ -49,10 +49,10 @@ export const editSubCategorySchema = {
 };
 
 export const deleteSubCategotySchema = {
-  body: Joi.object()
+  params: Joi.object()
     .required()
     .keys({
-      Id: objectId().required().messages({
+      id: objectId().required().messages({
         "string.base": "Category ID must be a string",
         "string.empty": "Category ID is required",
         "any.required": "Category ID is required",
