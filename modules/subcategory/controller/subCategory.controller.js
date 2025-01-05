@@ -3,6 +3,9 @@ import { StatusCodes } from "http-status-codes";
 import SubCategoryModel from "../model/subCategory.model.js";
 import slugify from "slugify";
 import ApiError from "../../../utils/api.error.js";
+import CategoryModel from "../../category/model/category.model.js";
+import { getCategoryHelperFunction } from "../../category/controller/category.controller.js";
+import mongoose from "mongoose";
 
 //          @desc                    get  subcategories ;
 //          @route                   get /subcategories/
@@ -36,6 +39,25 @@ export const getSubCategotyById = asyncHandler(async (req, res) => {
 
 export const createSubCategory = asyncHandler(async (req, res, next) => {
   const { name, mainCategoryId } = req.body;
+
+  // to make sure that the sub category is unique per category ;
+  // the user can have the same sub category across multiple categories ;
+  // but not in the same category ;
+  const existingSubCategory = await SubCategoryModel.findOne({
+    name,
+    mainCategoryId,
+  });
+
+  // if exists don't create ;
+  if (existingSubCategory) {
+    return next(
+      new ApiError(
+        `Subcategory ${name} already exists in the same category`,
+        StatusCodes.CONFLICT
+      )
+    );
+  }
+  // if the Main Category exists and the subCategory doesn't then finally create the sub category ;
   const newSubCategory = await SubCategoryModel.create({
     name,
     slug: slugify(name),
@@ -47,10 +69,6 @@ export const createSubCategory = asyncHandler(async (req, res, next) => {
       data: newSubCategory,
     });
   }
-
-  return next(
-    new ApiError("Couldn't Find the Category", StatusCodes.NO_CONTENT)
-  );
 });
 
 //          @desc                    edit specfic category  by Name ;

@@ -10,9 +10,8 @@ const checkIfExists = (Model, reqAttr, schemaAttr, shouldExist) => {
         message: `${reqAttr} is required`,
       });
     }
-
     const exists = await Model.exists({
-      [schemaAttr]: identifier, // if the attr is id so use compare it with _id .
+      [schemaAttr]: identifier,
     });
 
     if ((exists && shouldExist) || (!exists && !shouldExist))
@@ -20,15 +19,19 @@ const checkIfExists = (Model, reqAttr, schemaAttr, shouldExist) => {
       return next();
     else if (exists && !shouldExist) {
       // Object exists but shouldn't ;
-      return new ApiError(
-        `${identifier} already exists ...........................`,
-        StatusCodes.BAD_REQUEST
+      return next(
+        new ApiError(
+          `${Model.name} with ${schemaAttr} = ${identifier}  is already created `,
+          StatusCodes.BAD_REQUEST
+        )
       );
     } else if (!exists && shouldExist) {
       // "Object does not exist but should";
-      return new ApiError(
-        `${identifier} is not found ...........................`,
-        StatusCodes.BAD_REQUEST
+      return next(
+        new ApiError(
+          `${Model.name} with ${schemaAttr} = ${identifier} is not found `,
+          StatusCodes.BAD_REQUEST
+        )
       );
     }
   });

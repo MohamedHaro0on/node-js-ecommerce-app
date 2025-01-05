@@ -10,6 +10,7 @@ import ApiError from "../../../utils/api.error.js";
 //          @access                  private
 
 export const createCategory = expressAsyncHandler(async (req, res) => {
+  console.log("iam here");
   const { name } = req.body;
   const newCategory = await CategoryModel.create({
     name,
@@ -45,49 +46,21 @@ export const getCategories = expressAsyncHandler(async (req, res, next) => {
 //          @route                   GET /get-category
 //          @access                  public
 
-export const getCategoryByName = expressAsyncHandler(async (req, res, next) => {
-  const { name } = req.body;
-  let category = null;
-
-  if (name) category = await CategoryModel.find({ name });
-
-  //if Category was found :
-  if (category) {
-    res.status(StatusCodes.OK).json({
-      message: "Successfll",
-      data: category,
-    });
-  }
-  //if Category is not found :
-  return next(new ApiError("Category is not found", StatusCodes.NOT_FOUND));
-});
-
 //          @desc                    get specfic category by ID  ;
 //          @route                   GET /get-category
 //          @access                  public
 
-export const getCategoryById = expressAsyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  let category = await CategoryModel.aggregate([
-    {
-      $match: { _id: new mongoose.Types.ObjectId(id) }, // Use 'new' keyword
-    },
-    {
-      $lookup: {
-        from: "subcategories", // Collection name for SubCategoryModel
-        localField: "_id",
-        foreignField: "category",
-        as: "subCategories",
-      },
-    },
-    {
-      $project: {
-        name: 1, // Include the category name
-        subCategories: 1, // Include the populated sub-categories
-      },
-    },
-  ]);
-
+export const getCategory = expressAsyncHandler(async (req, res, next) => {
+  const { name, id } = req.query;
+  let category = null;
+  if (id) {
+    category = await await getCategoryHelperFunction(
+      "_id",
+      new mongoose.Types.ObjectId(id)
+    );
+  } else if (name) {
+    category = await getCategoryHelperFunction("name", name);
+  }
   //if Category was not found :
   if (category) {
     res.status(StatusCodes.OK).json({
@@ -125,9 +98,10 @@ export const updateCategory = expressAsyncHandler(async (req, res, next) => {
 //          @access                      Private
 
 export const deleteCategory = expressAsyncHandler(async (req, res, next) => {
-  const { id } = req.query;
+  const { id } = req.params;
 
-  const deletedCategory = await CategoryModel.findByIdAndDelete(id);
+  const deletedCategory = await CategoryModel.findByIdAndDelete({ _id: id });
+  console.log("this is the deleted category : ", deletedCategory);
   if (deletedCategory) {
     res.status(StatusCodes.OK).json({
       message: "Categoy Found and was Deleted",
@@ -137,3 +111,29 @@ export const deleteCategory = expressAsyncHandler(async (req, res, next) => {
   // handles if the category id is not found ;
   return next(new ApiError("Category is not found", StatusCodes.NOT_FOUND));
 });
+
+/// HELPER FUNCTIONS :
+
+export const getCategoryHelperFunction = async (searchTerm, value) => {
+  console.log("this is the search Term ", searchTerm, value);
+  let category = await CategoryModel.aggregate([
+    {
+      $match: { [searchTerm]: value }, // Use 'new' keyword
+    },
+    {
+      $lookup: {
+        from: "subcategories", // Collection name for SubCategoryModel
+        localField: "_id",
+        foreignField: "mainCategoryId",
+        as: "subCategories",
+      },
+    },
+    {
+      $project: {
+        name: 1, // Include the category name
+        subCategories: 1, // Include the populated sub-categories
+      },
+    },
+  ]);
+  return category;
+};

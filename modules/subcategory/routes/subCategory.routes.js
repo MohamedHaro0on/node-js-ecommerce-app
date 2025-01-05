@@ -22,15 +22,15 @@ const SubCategoryRoutes = Router();
 SubCategoryRoutes.post(
   "/create-subcategory",
   validateRequest(createSubCategotySchema),
-  checkIfExists(SubCategoryModel, "name", "name", false),
   checkIfExists(CategoryModel, "mainCategoryId", "_id", true),
+  // checkIfExists(SubCategoryModel, "name", "name", false),
   createSubCategory
 );
 SubCategoryRoutes.put(
   "/edit-subcategory",
   validateRequest(editSubCategorySchema),
   checkIfExists(CategoryModel, "categoryId", "_id", true),
-  checkIfExists(SubCategoryModel, "subCategoryId", "_id", true),
+  checkIfExists(SubCategoryModel, "subCategoryId", "_id", false),
   editSubCategory
 );
 SubCategoryRoutes.get("/get-subcategories", paginate, getSubCategories);
