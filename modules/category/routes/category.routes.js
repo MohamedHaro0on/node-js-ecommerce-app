@@ -34,6 +34,7 @@ categoryRouter.get("/get-categories", paginate, getCategories);
 categoryRouter.get(
   "/get-category",
   validateRequest(getCategorySchema),
+  checkIfExists(CategoryModel, "id", "_id", true),
   getCategory
 );
 

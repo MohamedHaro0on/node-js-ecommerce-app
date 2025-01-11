@@ -5,6 +5,7 @@ const checkIfExists = (Model, reqAttr, schemaAttr, shouldExist) => {
   return asyncHandler(async (req, res, next) => {
     const identifier =
       req.body[reqAttr] || req.params[reqAttr] || req.query[reqAttr];
+
     if (!identifier) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         message: `${reqAttr} is required`,

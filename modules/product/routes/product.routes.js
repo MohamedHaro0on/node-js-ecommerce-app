@@ -18,6 +18,7 @@ import {
 } from "../joi/product.joi.js";
 import checkIfExists from "../../../middleswares/check.if.exists.js";
 import ProductModel from "../model/product.model.js";
+import { StatusCodes } from "http-status-codes";
 
 const productRoutes = express.Router();
 
@@ -55,7 +56,7 @@ productRoutes.put(
 
 // Delete Product ;
 productRoutes.delete(
-  "/delete-product/:id",
+  "/delete-product",
   validateRequest(deleteProductSchema),
   checkIfExists(ProductModel, "id", "_id", true),
   deleteProduct

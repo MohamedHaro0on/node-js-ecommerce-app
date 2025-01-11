@@ -26,11 +26,10 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // Routes :
-app.use(categoryRouter);
-app.use(ProductRoutes);
-app.use(SubCategoryRoutes);
-app.use(brandRoutes);
-app.use(productRoutes);
+app.use("/categories/", categoryRouter);
+app.use("/products/", ProductRoutes);
+app.use("/sub-categories", SubCategoryRoutes);
+app.use("/brands/", brandRoutes);
 // Not implemented Errors :
 app.all("*", routeNotImplementedHandler);
 // Global error handling middleware for express ;
