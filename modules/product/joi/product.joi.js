@@ -1,8 +1,9 @@
 import Joi from "joi";
 import joiObjectId from "joi-objectid";
-import CategoryModel from "../../category/model/category.model.js";
-import BrandModel from "../../brand/model/brand.model.js";
-import SubCategoryModel from "../../subcategory/model/subCategory.model.js";
+import CheckCategoryExists from "../../../utils/joi.external.functions/check.category.exists.js";
+import CheckSubCategoriesExists from "../../../utils/joi.external.functions/check.sub.categories.exists.js";
+import CheckBrandExists from "../../../utils/joi.external.functions/check.brand.exists.js";
+import CheckSubCategoriesExistInTheSameCategory from "../../../utils/joi.external.functions/check.sub.categories.exist.in.same.category.js";
 
 const objectId = joiObjectId(Joi); // Initialize joi-objectid
 
@@ -73,24 +74,29 @@ export const createProductSchema = {
         "array.base": "images must be a list",
         "array.items": "All images must be strings.",
       }),
-
-      category: objectId().messages({
+      category: objectId().external(CheckCategoryExists).messages({
         "string.base": "Category ID must be a an object Id",
         "string.empty": "Category ID is required",
         "any.required": "Category ID is required",
         "string.pattern.name": "Category ID must be a valid MongoDB ObjectId",
+        "any.invalid": "Category ID is not found",
       }),
-      subCategory: objectId().messages({
-        "string.base": "Sub Category ID must be a an object Id",
-        "string.empty": "Sub Category ID is required",
-        "string.pattern.name":
-          "Sub Category ID must be a valid MongoDB ObjectId",
-      }),
-      brand: objectId().messages({
+      subCategories: Joi.array()
+        .items(
+          objectId().messages({
+            "array.base": "Subcategories must be a list",
+            "array.items": "All subcategories must be valid MongoDB ObjectIds.",
+            "any.invalid": "SubCategory ID is not found",
+          })
+        )
+        .external(CheckSubCategoriesExists)
+        .external(CheckSubCategoriesExistInTheSameCategory),
+      brand: objectId().external(CheckBrandExists).messages({
         "string.base": "Brand ID must be a an object Id",
         "string.empty": "Brand ID is required",
         "any.required": "Brand ID is required",
         "string.pattern.name": "Brand ID must be a valid MongoDB ObjectId",
+        "any.invalid": "Brand ID is not found",
       }),
     }),
 };
@@ -184,89 +190,30 @@ export const editProductSchema = {
         "number.min": "DiscountRatio must be more than or equal to 0%",
         "number.max": "DiscountRatio must be less than 100% item",
       }),
-      category: objectId()
-        .external(async (value, helper) => {
-          if (value) {
-            console.log("Fetching category from the database...");
-            const category = await CategoryModel.findById(value);
-
-            if (!category) {
-              console.log("Category not found:", value);
-              // If the category is not found, return an error
-              return helper.error("any.invalid", {
-                value,
-                message: `Category with id ${value} is not found`,
-              });
-            }
-
-            console.log("Category found:", category);
-            // If the category is found, return the value to indicate validation success
-            return value;
-          }
-        })
-        .messages({
-          "string.base": "Category ID must be a an object Id",
-          "string.empty": "Category ID is required",
-          "any.required": "Category ID is required",
-          "string.pattern.name": "Category ID must be a valid MongoDB ObjectId",
-          "any.invalid": "Category ID is not found",
-        }),
+      category: objectId().external(CheckCategoryExists).messages({
+        "string.base": "Category ID must be a an object Id",
+        "string.empty": "Category ID is required",
+        "any.required": "Category ID is required",
+        "string.pattern.name": "Category ID must be a valid MongoDB ObjectId",
+        "any.invalid": "Category ID is not found",
+      }),
       subCategories: Joi.array()
         .items(
-          objectId().external(async (value, helper) => {
-            if (value) {
-              console.log("Fetching subcategories from the database...");
-              const subCategories = await SubCategoryModel.find({
-                _id: { $exists: true, $in: [value] },
-              });
-
-              if (!subCategories || subCategories.length === 0) {
-                console.log("Subcategories not found:", value);
-                // If the subcategories are not found, return an error
-                return helper.error("any.invalid", {
-                  value,
-                  message: `Subcategories with id ${value} are not found`,
-                });
-              }
-
-              console.log("Subcategories found:", subCategories);
-              // If the subcategories are found, return the value to indicate validation success
-              return value;
-            }
+          objectId().messages({
+            "array.base": "Subcategories must be a list",
+            "array.items": "All subcategories must be valid MongoDB ObjectIds.",
+            // "any.invalid": "SubCategory ID is not found",
           })
         )
-        .messages({
-          "array.base": "Subcategories must be a list",
-          "array.items": "All subcategories must be valid MongoDB ObjectIds.",
-          "any.invalid": "SubCategory ID is not found",
-        }),
-      brand: objectId()
-        .external(async (value, helper) => {
-          if (value) {
-            console.log("Fetching brand from the database...");
-            const brand = await BrandModel.findById(value);
-
-            if (!brand) {
-              console.log("Brand not found:", value);
-              // If the brand is not found, return an error
-              return helper.error("any.invalid", {
-                value,
-                message: `Brand with id ${value} is not found`,
-              });
-            }
-
-            console.log("Brand found:", brand);
-            // If the brand is found, return the value to indicate validation success
-            return value;
-          }
-        })
-        .messages({
-          "string.base": "Brand ID must be a an object Id",
-          "string.empty": "Brand ID is required",
-          "any.required": "Brand ID is required",
-          "string.pattern.name": "Brand ID must be a valid MongoDB ObjectId",
-          "any.invalid": "Brand ID is not found",
-        }),
+        .external(CheckSubCategoriesExists)
+        .external(CheckSubCategoriesExistInTheSameCategory),
+      brand: objectId().external(CheckBrandExists).messages({
+        "string.base": "Brand ID must be a an object Id",
+        "string.empty": "Brand ID is required",
+        "any.required": "Brand ID is required",
+        "string.pattern.name": "Brand ID must be a valid MongoDB ObjectId",
+        "any.invalid": "Brand ID is not found",
+      }),
     }),
 };
 

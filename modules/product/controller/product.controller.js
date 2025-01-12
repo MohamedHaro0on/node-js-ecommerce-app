@@ -4,10 +4,15 @@ import slugify from "slugify";
 import ProductModel from "../model/product.model.js";
 import ApiError from "../../../utils/api.error.js";
 
+const removeAttr = "-createdAt -updatedAt -__v";
+const getFullInfo = [
+  { path: "brand", select: removeAttr }, // Populate the brand field
+  { path: "category", select: removeAttr }, // Populate the category field
+  { path: "subCategories", select: removeAttr }, // Populate the subCategories array
+];
 //          @desc                    Create Product
 //          @route                   POST  /create-product
 //          @access                  private
-
 export const createProduct = expressAsyncHandler(async (req, res) => {
   req.body.slug = slugify(req.body.name);
   const newProduct = await ProductModel.create(req.body);
@@ -33,8 +38,8 @@ export const getProducts = expressAsyncHandler(async (req, res, next) => {
   const products = await ProductModel.find({})
     .skip(req.pagination.skip)
     .limit(req.pagination.limit)
-    .populate({ path: "category", select: "-createdAt -updatedAt -__v" });
-
+    .populate(getFullInfo)
+    .select(removeAttr);
   if (!products) {
     next(
       new ApiError("there are no products to display", StatusCodes.NO_CONTENT)
@@ -53,10 +58,9 @@ export const getProducts = expressAsyncHandler(async (req, res, next) => {
 //          @access                  public
 export const getProductById = expressAsyncHandler(async (req, res, next) => {
   const { id } = req.query;
-  let product = await ProductModel.findById(id).populate({
-    path: "category",
-    select: "-createdAt -updatedAt -__v",
-  });
+  let product = await ProductModel.findById(id)
+    .populate(getFullInfo)
+    .select(removeAttr);
   //if Product was not found :
   if (product) {
     res.status(StatusCodes.OK).json({
@@ -73,10 +77,9 @@ export const getProductById = expressAsyncHandler(async (req, res, next) => {
 //          @access                  public
 export const getProductsByName = expressAsyncHandler(async (req, res, next) => {
   const { name } = req.query;
-  let products = await ProductModel.find({ name }).populate({
-    path: "category",
-    select: "-createdAt -updatedAt -__v",
-  });
+  let products = await ProductModel.find({ name })
+    .populate(getFullInfo)
+    .select(removeAttr);
   //if Product was not found :
   if (products && products.length > 0) {
     res.status(StatusCodes.OK).json({
@@ -105,7 +108,9 @@ export const updateProduct = expressAsyncHandler(async (req, res, next) => {
 
   const product = await ProductModel.findByIdAndUpdate({ _id: id }, req.body, {
     new: true,
-  }).populate({ path: "category", select: "-createdAt -updatedAt -__v" });
+  })
+    .populate(getFullInfo)
+    .select(removeAttr);
   if (product) {
     res.status(StatusCodes.ACCEPTED).json({
       message: "Succesfull",

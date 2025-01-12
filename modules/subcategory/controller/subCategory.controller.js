@@ -35,25 +35,8 @@ export const getSubCategotyById = asyncHandler(async (req, res) => {
 //          @route                   Post /subcategories/create
 //          @access                  private
 
-export const createSubCategory = asyncHandler(async (req, res, next) => {
+export const createSubCategory = asyncHandler(async (req, res) => {
   const { name, mainCategoryId } = req.body;
-
-  // to make sure that the sub category is unique per category ;
-  // the user can have the same sub category across multiple categories ;
-  // but not in the same category ;
-  const existingSubCategory = await SubCategoryModel.findOne({
-    name,
-    mainCategoryId,
-  });
-  // if exists don't create ;
-  if (existingSubCategory) {
-    return next(
-      new ApiError(
-        `Subcategory ${name} already exists in the same category`,
-        StatusCodes.CONFLICT
-      )
-    );
-  }
   // if the Main Category exists and the subCategory doesn't then finally create the sub category ;
   const newSubCategory = await SubCategoryModel.create({
     name,

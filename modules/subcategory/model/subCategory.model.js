@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import SubCategoryScheam from "../schema/subCategory.schema.js";
+import SubCategorySchema from "../schema/subCategory.schema.js";
 
-const SubCategoryModel = mongoose.model("SubCategory", SubCategoryScheam);
+const SubCategoryModel = mongoose.model("SubCategory", SubCategorySchema);
 
 export default SubCategoryModel;

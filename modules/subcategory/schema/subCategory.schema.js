@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
-import CategoryModel from "../../category/model/category.model.js";
-import asyncHandler from "express-async-handler";
-import ApiError from "../../../utils/api.error.js";
-import { StatusCodes } from "http-status-codes";
-import SubCategoryModel from "../model/subCategory.model.js";
+// import CategoryModel from "../../category/model/category.model.js";
+// import asyncHandler from "express-async-handler";
+// import ApiError from "../../../utils/api.error.js";
+// import { StatusCodes } from "http-status-codes";
+// import SubCategoryModel from "../model/subCategory.model.js";
 
 const SubCategorySchema = new mongoose.Schema(
   {
@@ -21,7 +21,7 @@ const SubCategorySchema = new mongoose.Schema(
       trim: true,
     },
     mainCategoryId: {
-      type: mongoose.Schema.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       required: [true, "Main Category is Required"],
       trim: true,

@@ -28,13 +28,13 @@ const CategorySchema = new mongoose.Schema(
 );
 CategorySchema.index({ name: 1 }, { unique: true });
 
-// Pre-save hook to validate mainCategoryId
+// Pre-save hook to validate wether a Category with the same name already exists .
 CategorySchema.pre("save", function (next) {
   const object = this;
   asyncHandler(async function () {
     const category = await CategoryModel.exists({ name: object.name });
     if (category) {
-      // If the category does not exist, throw an error
+      // If the category exists , throw an error
       return next(
         new ApiError(
           `Category with name ${object.name} is found`,
@@ -42,7 +42,7 @@ CategorySchema.pre("save", function (next) {
         )
       );
     }
-    // If the category exists, proceed to save the document
+    // If the category doesn't exists, proceed to save the document
     next();
   }).call(this, next); // Bind `this` and pass `next`
 });
