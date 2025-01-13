@@ -1,6 +1,7 @@
 [
   {
     "name": "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
+    "slug": "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
     "quantity": 10,
     "soldCount": 25,
     "price": 109.95,
@@ -13,6 +14,7 @@
   },
   {
     "name": "Mens Casual Premium Slim Fit T-Shirts",
+    "slug": "Mens Casual Premium Slim Fit T-Shirts",
     "quantity": 20,
     "soldCount": 30,
     "price": 22.3,
@@ -25,6 +27,7 @@
   },
   {
     "name": "Mens Cotton Jacket",
+    "slug": "Mens Cotton Jacket",
     "quantity": 20,
     "soldCount": 75,
     "price": 55.99,
@@ -36,6 +39,7 @@
   },
   {
     "name": "Mens Casual Slim Fit",
+    "slug": "Mens Casual Slim Fit",
     "quantity": 100,
     "soldCount": 101,
     "price": 15.99,
@@ -47,6 +51,7 @@
   },
   {
     "name": "John Hardy Women's Legends Naga Gold & Silver Dragon Station Chain Bracelet",
+    "slug": "John Hardy Women's Legends Naga Gold & Silver Dragon Station Chain Bracelet",
     "quantity": 100,
     "soldCount": 14,
     "price": 695,
@@ -58,6 +63,7 @@
   },
   {
     "name": "Solid Gold Petite Micropave",
+    "slug": "Solid Gold Petite Micropave",
     "quantity": 75,
     "soldCount": 69,
     "price": 168,
@@ -69,6 +75,7 @@
   },
   {
     "name": "White Gold Plated Princess",
+    "slug": "White Gold Plated Princess",
     "quantity": 33,
     "soldCount": 99,
     "price": 9.99,
@@ -80,6 +87,7 @@
   },
   {
     "name": "Pierced Owl Rose Gold Plated Stainless Steel Double",
+    "slug": "Pierced Owl Rose Gold Plated Stainless Steel Double",
     "quantity": 90,
     "soldCount": 32,
     "price": 10.99,
@@ -91,6 +99,7 @@
   },
   {
     "name": "WD 2TB Elements Portable External Hard Drive - USB 3.0",
+    "slug": "WD 2TB Elements Portable External Hard Drive - USB 3.0",
     "quantity": 102,
     "soldCount": 51,
     "price": 64,
@@ -102,6 +111,7 @@
   },
   {
     "name": "SanDisk SSD PLUS 1TB Internal SSD - SATA III 6 Gb/s",
+    "slug": "SanDisk SSD PLUS 1TB Internal SSD - SATA III 6 Gb/s",
     "quantity": 104,
     "soldCount": 9,
     "price": 109,
