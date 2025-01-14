@@ -14,6 +14,10 @@ export const getSubCategories = asyncHandler(async (req, res) => {
   // .populate({ path: "mainCategoryId", select: "name -_id" });
   res.status(StatusCodes.OK).json({
     message: "Sub Categories Fetched Successfully",
+    limit: req.pagination.limit,
+    currentPage: req.pagination.page,
+    totalCount: req.pagination.totalCount,
+    totalPages: req.pagination.totalPages,
     data: subcategories,
   });
 });

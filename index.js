@@ -8,7 +8,7 @@ import errorHandler from "./handlers/error.handler.js";
 import routeNotImplementedHandler from "./handlers/notImplementedRoute.handler.js";
 import SubCategoryRoutes from "./modules/subcategory/routes/subCategory.routes.js";
 import brandRoutes from "./modules/brand/routes/brand.routes.js";
-import productRoutes from "./modules/product/routes/product.routes.js";
+import paginateForGetRequests from "./middleswares/pagination.js";
 
 const app = express();
 

@@ -85,9 +85,9 @@ const ProductSchema = new mongoose.Schema(
 
 ProductSchema.index({ name: 1 });
 
-// Define a virtual property for currentPrice
-ProductSchema.virtual("currentPrice").get(function () {
-  return this.price - this.price * this.discountRatio;
-});
+// // Define a virtual property for currentPrice
+// ProductSchema.virtual("currentPrice").get(function () {
+//   return this.price - this.price * this.discountRatio;
+// });
 
 export default ProductSchema;

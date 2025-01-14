@@ -1,7 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 
 const errorHandler = (err, req, res, next) => {
-  console.log("this is the error : ", err);
   err.statusCode = err.statusCode || StatusCodes.BAD_REQUEST;
   err.status = err.status || "error";
   if (process.env.NODE_ENV === "development") {

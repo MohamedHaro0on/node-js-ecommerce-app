@@ -7,6 +7,27 @@ import CheckSubCategoriesExistInTheSameCategory from "../../../utils/joi.externa
 
 const objectId = joiObjectId(Joi); // Initialize joi-objectid
 
+const fieldsAttribute = [
+  "name",
+  "price",
+  "category",
+  "subCategories",
+  "brand",
+  "soldCount",
+  "ratingCount",
+  "ratingAverage",
+  "coverImage",
+];
+const sortAttributes = [
+  "name",
+  "price",
+  "category",
+  "subCategories",
+  "brand",
+  "soldCount",
+  "ratingCount",
+  "ratingAverage",
+];
 export const createProductSchema = {
   body: Joi.object()
     .required()
@@ -82,6 +103,7 @@ export const createProductSchema = {
         "any.invalid": "Category ID is not found",
       }),
       subCategories: Joi.array()
+        .optional()
         .items(
           objectId().messages({
             "array.base": "Subcategories must be a list",
@@ -89,9 +111,10 @@ export const createProductSchema = {
             "any.invalid": "SubCategory ID is not found",
           })
         )
+        .unique()
         .external(CheckSubCategoriesExists)
         .external(CheckSubCategoriesExistInTheSameCategory),
-      brand: objectId().external(CheckBrandExists).messages({
+      brand: objectId().optional().external(CheckBrandExists).messages({
         "string.base": "Brand ID must be a an object Id",
         "string.empty": "Brand ID is required",
         "any.required": "Brand ID is required",
@@ -205,6 +228,7 @@ export const editProductSchema = {
             // "any.invalid": "SubCategory ID is not found",
           })
         )
+        .unique()
         .external(CheckSubCategoriesExists)
         .external(CheckSubCategoriesExistInTheSameCategory),
       brand: objectId().external(CheckBrandExists).messages({
@@ -230,15 +254,279 @@ export const getProductByIdSchema = {
     }),
 };
 
-export const getProductsByNameSchema = {
+export const getProductsSchema = {
   query: Joi.object()
     .required()
     .keys({
-      name: Joi.string().required().min(3).max(100).messages({
+      name: Joi.string().optional().min(3).max(100).messages({
         "string.base": "Name must be a string",
         "string.empty": "Name is required",
         "string.min": "Name must be at least 3 characters long",
         "string.max": "Name must not exceed 100 characters",
       }),
+      price: Joi.alternatives()
+        .try(
+          Joi.number().min(0).messages({
+            "number.base": "Price must be a number",
+            "number.min": "Price must be more than or equal to zero",
+          }),
+          Joi.object({
+            gte: Joi.number().min(0).messages({
+              "number.base": "Price gte must be a number",
+              "number.min": "Price gte must be more than or equal to zero",
+            }),
+            lte: Joi.number().min(0).messages({
+              "number.base": "Price lte must be a number",
+              "number.min": "Price lte must be more than or equal to zero",
+            }),
+            gt: Joi.number().min(0).messages({
+              "number.base": "Price gte must be a number",
+              "number.min": "Price gte must be more than or equal to zero",
+            }),
+            lt: Joi.number().min(0).messages({
+              "number.base": "Price lte must be a number",
+              "number.min": "Price lte must be more than or equal to zero",
+            }),
+          })
+            .min(1)
+            .messages({
+              "object.base": "Price must be a number or an object",
+              "object.min":
+                "Price object must have at least one key (gte or lte)",
+            })
+        )
+        .messages({
+          "alternatives.match":
+            "Price must be a number or an object with gte/lte keys",
+        }),
+      discountRatio: Joi.alternatives()
+        .try(
+          Joi.number().min(0).max(100).messages({
+            "number.base": "Discount Ratio must be a number",
+            "number.min": "Discount Ratio must be more than or equal to zero",
+          }),
+          Joi.object({
+            gte: Joi.number().min(0).messages({
+              "number.base": "Discount Ratio gte must be a number",
+              "number.min":
+                "Discount Ratio gte must be more than or equal to zero",
+            }),
+            lte: Joi.number().min(0).messages({
+              "number.base": "Discount Ratio lte must be a number",
+              "number.min":
+                "Discount Ratio lte must be more than or equal to zero",
+            }),
+            gt: Joi.number().min(0).messages({
+              "number.base": "Discount Ratio gte must be a number",
+              "number.min":
+                "Discount Ratio gte must be more than or equal to zero",
+            }),
+            lt: Joi.number().min(0).messages({
+              "number.base": "Discount Ratio lte must be a number",
+              "number.min":
+                "Discount Ratio lte must be more than or equal to zero",
+            }),
+          })
+            .min(1)
+            .messages({
+              "object.base": "Discount Ratio must be a number or an object",
+              "object.min":
+                "Discount Ratio object must have at least one key (gte or lte)",
+            })
+        )
+        .messages({
+          "alternatives.match":
+            "Discount Ratio must be a number or an object with gte/lte keys",
+        }),
+      category: objectId().external(CheckCategoryExists).messages({
+        "string.base": "Category ID must be a an object Id",
+        "string.empty": "Category ID is required",
+        "any.required": "Category ID is required",
+        "string.pattern.name": "Category ID must be a valid MongoDB ObjectId",
+        "any.invalid": "Category ID is not found",
+      }),
+      subCategories: Joi.array()
+        .items(
+          objectId().messages({
+            "array.base": "Subcategories must be a list",
+            "array.items": "All subcategories must be valid MongoDB ObjectIds.",
+            // "any.invalid": "SubCategory ID is not found",
+          })
+        )
+        .unique()
+        .external(CheckSubCategoriesExists)
+        .external(CheckSubCategoriesExistInTheSameCategory),
+      brand: objectId().external(CheckBrandExists).messages({
+        "string.base": "Brand ID must be a an object Id",
+        "string.empty": "Brand ID is required",
+        "any.required": "Brand ID is required",
+        "string.pattern.name": "Brand ID must be a valid MongoDB ObjectId",
+        "any.invalid": "Brand ID is not found",
+      }),
+      quantity: Joi.alternatives()
+        .try(
+          Joi.number().min(0).max(1000).messages({
+            "number.base": "Quantity must be a number",
+            "number.min": "Quantity must be more than or equal to zero",
+          }),
+          Joi.object({
+            gte: Joi.number().min(0).messages({
+              "number.base": "Quantity gte must be a number",
+              "number.min": "Quantity gte must be more than or equal to zero",
+            }),
+            lte: Joi.number().min(0).messages({
+              "number.base": "Quantity lte must be a number",
+              "number.min": "Quantity lte must be more than or equal to zero",
+            }),
+            gt: Joi.number().min(0).messages({
+              "number.base": "Quantity gte must be a number",
+              "number.min": "Quantity gte must be more than or equal to zero",
+            }),
+            lt: Joi.number().min(0).messages({
+              "number.base": "Quantity lte must be a number",
+              "number.min": "Quantity lte must be more than or equal to zero",
+            }),
+          })
+            .min(1)
+            .messages({
+              "object.base": "Quantity must be a number or an object",
+              "object.min":
+                "Quantity object must have at least one key (gte or lte)",
+            })
+        )
+        .messages({
+          "alternatives.match":
+            "Quantity must be a number or an object with gte/lte keys",
+        }),
+      soldCount: Joi.alternatives()
+        .try(
+          Joi.number().min(0).messages({
+            "number.base": "Sold Count must be a number",
+            "number.min": "Sold Count must be more than or equal to zero",
+          }),
+          Joi.object({
+            gte: Joi.number().min(0).messages({
+              "number.base": "Sold Count gte must be a number",
+              "number.min": "Sold Count gte must be more than or equal to zero",
+            }),
+            lte: Joi.number().min(0).messages({
+              "number.base": "Sold Count lte must be a number",
+              "number.min": "Sold Count lte must be more than or equal to zero",
+            }),
+            gt: Joi.number().min(0).messages({
+              "number.base": "Sold Count gte must be a number",
+              "number.min": "Sold Count gte must be more than or equal to zero",
+            }),
+            lt: Joi.number().min(0).messages({
+              "number.base": "Sold Count lte must be a number",
+              "number.min": "Sold Count lte must be more than or equal to zero",
+            }),
+          })
+            .min(1)
+            .messages({
+              "object.base": "Sold Count must be a number or an object",
+              "object.min":
+                "Sold Count object must have at least one key (gte or lte)",
+            })
+        )
+        .messages({
+          "alternatives.match":
+            "Quantity must be a number or an object with gte/lte keys",
+        }),
+      ratingCount: Joi.alternatives()
+        .try(
+          Joi.number().min(0).messages({
+            "number.base": "Rating Count must be a number",
+            "number.min": "Rating Count must be more than or equal to zero",
+          }),
+          Joi.object({
+            gte: Joi.number().min(0).messages({
+              "number.base": "Rating Count gte must be a number",
+              "number.min":
+                "Rating Count gte must be more than or equal to zero",
+            }),
+            lte: Joi.number().min(0).messages({
+              "number.base": "Rating Count lte must be a number",
+              "number.min":
+                "Rating Count lte must be more than or equal to zero",
+            }),
+            gt: Joi.number().min(0).messages({
+              "number.base": "Rating Count gte must be a number",
+              "number.min":
+                "Rating Count gte must be more than or equal to zero",
+            }),
+            lt: Joi.number().min(0).messages({
+              "number.base": "Rating Count lte must be a number",
+              "number.min":
+                "Rating Count lte must be more than or equal to zero",
+            }),
+          })
+            .min(1)
+            .messages({
+              "object.base": "Rating Count must be a number or an object",
+              "object.min":
+                "Rating Count object must have at least one key (gte or lte)",
+            })
+        )
+        .messages({
+          "alternatives.match":
+            "Rating Count must be a number or an object with gte/lte keys",
+        }),
+      ratingAverage: Joi.alternatives()
+        .try(
+          Joi.number().min(1).max(5).messages({
+            "number.base": "Rating Average must be a number",
+            "number.min": "Rating Average must be more than or equal to zero",
+          }),
+          Joi.object({
+            gte: Joi.number().min(0).messages({
+              "number.base": "Rating Average gte must be a number",
+              "number.min":
+                "Rating Average gte must be more than or equal to one",
+            }),
+            lte: Joi.number().min(0).messages({
+              "number.base": "Rating Average lte must be a number",
+              "number.min":
+                "Rating Average lte must be more than or equal to five",
+            }),
+            gt: Joi.number().min(0).messages({
+              "number.base": "Rating Average gte must be a number",
+              "number.min":
+                "Rating Average gte must be more than or equal to one",
+            }),
+            lt: Joi.number().min(0).messages({
+              "number.base": "Rating Average lte must be a number",
+              "number.min":
+                "Rating Average lte must be more than or equal to five",
+            }),
+          })
+            .min(1)
+            .messages({
+              "object.base": "Price must be a number or an object",
+              "object.min":
+                "Price object must have at least one key (gte or lte)",
+            })
+        )
+        .messages({
+          "alternatives.match":
+            "Price must be a number or an object with gte/lte keys",
+        }),
+      sort: Joi.string()
+        .optional()
+        .pattern(/^(-?(soldCount|price|ratingAverage),?)+$/)
+        .messages({
+          "string.base": "Sort must be a string",
+          "string.empty": "Sort is required",
+          "string.pattern.base":
+            "Sort must contain valid fields: soldCount, price, ratingAverage. Use '-' for descending order.",
+        }),
+      fields: Joi.string()
+        .optional()
+        .pattern(new RegExp(`^((${fieldsAttribute.join("|")}),?)+$`)) // Dynamically create regex
+        .messages({
+          "string.base": "Sort must be a string",
+          "string.empty": "Sort is required",
+          "string.pattern.base": `fields must contain valid fields: ${fieldsAttribute.join(" ,")}) Use '-' for descending order.`,
+        }),
     }),
 };

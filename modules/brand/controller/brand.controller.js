@@ -35,8 +35,10 @@ export const getBrands = expressAsyncHandler(async (req, res, next) => {
   }
   res.status(StatusCodes.OK).json({
     message: "Successfull",
-    page: req.pagination.page,
     limit: req.pagination.limit,
+    currentPage: req.pagination.page,
+    totalCount: req.pagination.totalCount,
+    totalPages: req.pagination.totalPages,
     data: brands,
   });
 });

@@ -16,11 +16,16 @@ import {
 } from "../joi/category.joi.js";
 import checkIfExists from "../../../middleswares/check.if.exists.js";
 import CategoryModel from "../model/category.model.js";
+import paginateForGetRequests from "../../../middleswares/pagination.js";
 
-const categoryRouter = express.Router();
+const categoryRoutes = express.Router();
+
+categoryRoutes.use((req, res, next) =>
+  paginateForGetRequests(req, res, next, CategoryModel)
+);
 
 // Create New Category
-categoryRouter.post(
+categoryRoutes.post(
   "/create-category",
   validateRequest(createCategorySchema),
   checkIfExists(CategoryModel, "name", "name", false),
@@ -28,10 +33,10 @@ categoryRouter.post(
 );
 
 // Get All Categories
-categoryRouter.get("/get-categories", paginate, getCategories);
+categoryRoutes.get("/get-categories", paginate, getCategories);
 
 // Get Specfic Category By Name ;
-categoryRouter.get(
+categoryRoutes.get(
   "/get-category",
   validateRequest(getCategorySchema),
   checkIfExists(CategoryModel, "id", "_id", true),
@@ -39,7 +44,7 @@ categoryRouter.get(
 );
 
 // Update Category ;
-categoryRouter.put(
+categoryRoutes.put(
   "/update-category",
   checkIfExists(CategoryModel, "id", "_id", true),
   validateRequest(editCategorySchema),
@@ -47,11 +52,11 @@ categoryRouter.put(
 );
 
 // Delete Category ;
-categoryRouter.delete(
+categoryRoutes.delete(
   "/delete-category/:id",
   validateRequest(deleteCategorySchema),
   checkIfExists(CategoryModel, "id", "_id", true),
   deleteCategory
 );
 
-export default categoryRouter;
+export default categoryRoutes;

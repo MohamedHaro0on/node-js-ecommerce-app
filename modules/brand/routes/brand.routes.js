@@ -16,8 +16,15 @@ import {
 } from "../joi/brand.joi.js";
 import checkIfExists from "../../../middleswares/check.if.exists.js";
 import BrandModel from "../model/brand.model.js";
+import paginateForGetRequests from "../../../middleswares/pagination.js";
 
 const brandRoutes = express.Router();
+
+// Custom middleware to apply paginate only to GET requests
+brandRoutes.use((req, res, next) =>
+  paginateForGetRequests(req, res, next, BrandModel)
+);
+brandRoutes.use(paginateForGetRequests);
 
 // Create New Brand
 brandRoutes.post(

@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import SubCategoryModel from "../../modules/subcategory/model/subCategory.model.js";
 import ApiError from "../api.error.js";
 import { StatusCodes } from "http-status-codes";
@@ -23,9 +22,9 @@ const CheckSubCategoryExistInTheSameCategory = async (
         `SubCategory with name " ${subCategory.name} "  not found or does not belong to the specified category " ${category.name} "`,
         StatusCodes.BAD_REQUEST
       );
+    } else {
+      return subCategoryId;
     }
-
-    return subCategoryId;
   } catch (error) {
     throw new Error(error.message); // Propagate the error
   }
@@ -36,14 +35,15 @@ const CheckSubCategoriesExistInTheSameCategory = async (
   helper
 ) => {
   try {
-    const categoryId = helper.state.ancestors[0].category;
-    const category = await CategoryModel.findById(categoryId);
+    if (subCategoryIds) {
+      const categoryId = helper.state.ancestors[0].category;
+      const category = await CategoryModel.findById(categoryId);
 
-    // Validate each subCategoryId
-    for (const subCategoryId of subCategoryIds) {
-      await CheckSubCategoryExistInTheSameCategory(subCategoryId, category);
+      // Validate each subCategoryId
+      for (const subCategoryId of subCategoryIds) {
+        await CheckSubCategoryExistInTheSameCategory(subCategoryId, category);
+      }
     }
-
     return subCategoryIds; // Return the valid subCategoryIds
   } catch (error) {
     throw new ApiError(error.message, StatusCodes.BAD_REQUEST); // Propagate the error

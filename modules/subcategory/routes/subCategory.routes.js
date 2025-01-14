@@ -17,8 +17,15 @@ import {
 import SubCategoryModel from "../model/subCategory.model.js";
 import checkIfExists from "../../../middleswares/check.if.exists.js";
 import CategoryModel from "../../category/model/category.model.js";
+import paginateForGetRequests from "../../../middleswares/pagination.js";
 
 const SubCategoryRoutes = Router();
+
+// Custom middleware to apply paginate only to GET requests
+SubCategoryRoutes.use((req, res, next) =>
+  paginateForGetRequests(req, res, next, CategoryModel)
+);
+SubCategoryRoutes.use(paginateForGetRequests);
 
 SubCategoryRoutes.post(
   "/create-subcategory",

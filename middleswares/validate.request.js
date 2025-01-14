@@ -22,16 +22,17 @@ const validateRequest = (schema) => {
     } catch (error) {
       let customError = null;
       if (error.details) {
+        console.log("this is inside the error.details 1", error);
         customError = new ApiError(
           error.details.map((detail) => detail.message).join(", "),
           StatusCodes.BAD_REQUEST
         );
         errorHandler(customError, req, res, next);
+      } else {
+        // Handle custom errors (e.g., from CheckSubCategoriesExistInTheSameCategory)
+        customError = new ApiError(error?.message, StatusCodes.BAD_REQUEST);
+        errorHandler(customError, req, res, next);
       }
-
-      // Handle custom errors (e.g., from CheckSubCategoriesExistInTheSameCategory)
-      customError = new ApiError(error.message, StatusCodes.BAD_REQUEST);
-      errorHandler(customError, req, res, next);
     }
   };
 };
