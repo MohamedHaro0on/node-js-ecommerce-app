@@ -4,6 +4,7 @@ import slugify from "slugify";
 import mongoose from "mongoose";
 import CategoryModel from "../model/category.model.js";
 import ApiError from "../../../utils/api.error.js";
+import ApiFeatuers from "../../../utils/api.featuers.js";
 
 //          @desc                    Create Category
 //          @route                   POST  /create-category
@@ -28,18 +29,21 @@ export const createCategory = expressAsyncHandler(async (req, res) => {
 //          @access                      public
 
 export const getCategories = expressAsyncHandler(async (req, res, next) => {
-  const categories = await CategoryModel.find({})
-    .skip(req.pagination.skip)
-    .limit(req.pagination.limit);
+  const apiFeatures = new ApiFeatuers(CategoryModel.find({}), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .search()
+    .paginate(await CategoryModel.estimatedDocumentCount());
+  const { mongooseQuery, paginationResult } = apiFeatures;
+
+  const categories = await mongooseQuery;
   if (!categories) {
     next(new ApiError("Categories is Empty", StatusCodes.NO_CONTENT));
   }
   res.status(StatusCodes.OK).json({
     message: "Successfull",
-    limit: req.pagination.limit,
-    currentPage: req.pagination.page,
-    totalCount: req.pagination.totalCount,
-    totalPages: req.pagination.totalPages,
+    ...paginationResult,
     data: categories,
   });
 });

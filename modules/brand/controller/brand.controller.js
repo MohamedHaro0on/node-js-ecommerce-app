@@ -4,6 +4,7 @@ import slugify from "slugify";
 import mongoose from "mongoose";
 import BrandModel from "../model/brand.model.js";
 import ApiError from "../../../utils/api.error.js";
+import ApiFeature from "../../../utils/api.featuers.js";
 
 //          @desc                    Create Brand
 //          @route                   POST  /create-brand
@@ -27,18 +28,20 @@ export const createBrand = expressAsyncHandler(async (req, res) => {
 //          @access                      public
 
 export const getBrands = expressAsyncHandler(async (req, res, next) => {
-  const brands = await BrandModel.find({})
-    .skip(req.pagination.skip)
-    .limit(req.pagination.limit);
+  const apiFeatures = new ApiFeature(BrandModel.find(), req.query)
+    .paginate(await BrandModel.estimatedDocumentCount())
+    .filter()
+    .search()
+    .limitFields()
+    .sort();
+  const { mongooseQuery, paginationResult } = apiFeatures;
+  const brands = await mongooseQuery;
   if (!brands) {
     next(new ApiError("brands are Empty", StatusCodes.NO_CONTENT));
   }
   res.status(StatusCodes.OK).json({
     message: "Successfull",
-    limit: req.pagination.limit,
-    currentPage: req.pagination.page,
-    totalCount: req.pagination.totalCount,
-    totalPages: req.pagination.totalPages,
+    ...paginationResult,
     data: brands,
   });
 });

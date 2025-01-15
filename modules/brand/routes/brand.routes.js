@@ -20,11 +20,11 @@ import paginateForGetRequests from "../../../middleswares/pagination.js";
 
 const brandRoutes = express.Router();
 
-// Custom middleware to apply paginate only to GET requests
-brandRoutes.use((req, res, next) =>
-  paginateForGetRequests(req, res, next, BrandModel)
-);
-brandRoutes.use(paginateForGetRequests);
+// // Custom middleware to apply paginate only to GET requests
+// brandRoutes.use((req, res, next) =>
+//   paginateForGetRequests(req, res, next, BrandModel)
+// );
+// brandRoutes.use(paginateForGetRequests);
 
 // Create New Brand
 brandRoutes.post(
@@ -35,7 +35,7 @@ brandRoutes.post(
 );
 
 // Get All Brands
-brandRoutes.get("/get-brands", paginate, getBrands);
+brandRoutes.get("/get-brands", getBrands);
 
 // Get Specfic Brand By Id;
 brandRoutes.get(

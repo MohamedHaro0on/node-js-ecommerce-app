@@ -513,7 +513,7 @@ export const getProductsSchema = {
         }),
       sort: Joi.string()
         .optional()
-        .pattern(/^(-?(soldCount|price|ratingAverage),?)+$/)
+        .pattern(/^(-?((soldCount|price|ratingAverage)),?)+$/)
         .messages({
           "string.base": "Sort must be a string",
           "string.empty": "Sort is required",
@@ -528,5 +528,24 @@ export const getProductsSchema = {
           "string.empty": "Sort is required",
           "string.pattern.base": `fields must contain valid fields: ${fieldsAttribute.join(" ,")}) Use '-' for descending order.`,
         }),
+      keyword: Joi.string().min(1).max(30).messages({
+        "string.base": "key word must be a string",
+        "string.empty": "key word is required",
+        "string.min": "key word must be at least 10 characters long",
+        "string.max": "description must not exceed 500 characters",
+        "any.required": "key word is required",
+      }),
+      page: Joi.number().min(0).messages({
+        "number.base": "Page must be a number",
+        "number.empty": "Page is required",
+        "number.min": "Page must be more than or equal to zero",
+        "any.required": "Page is required",
+      }),
+      limit: Joi.number().min(0).messages({
+        "number.base": "Limit  must be a number",
+        "number.empty": "Limit  is required",
+        "number.min": "Limit  must be more than or equal to zero",
+        "any.required": "Limit  is required",
+      }),
     }),
 };

@@ -3,6 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import slugify from "slugify";
 import ProductModel from "../model/product.model.js";
 import ApiError from "../../../utils/api.error.js";
+import ApiFeatuers from "../../../utils/api.featuers.js";
 
 const removeAttr = "-createdAt -updatedAt -__v";
 const getFullInfo = [
@@ -36,53 +37,21 @@ export const createProduct = expressAsyncHandler(async (req, res) => {
 
 export const getProducts = expressAsyncHandler(async (req, res, next) => {
   // Base query
-  let mongooseQuery = ProductModel.find(req.filter)
-    .skip(req.pagination.skip)
-    .limit(req.pagination.limit)
-    .populate(getFullInfo);
-
-  // Fields Linting
-  if (req.query.fields) {
-    // If fields are specified:
-    const fields = req.query.fields
-      .split(",")
-      .map((field) => field.trim()) // Trim whitespace
-      .filter((field) => field) // Remove empty strings
-      .concat([" _id", "category", "subCategories"]) // Always include these fields
-      .join(" "); // Join into a single string
-
-    console.log("Selected fields:", fields);
-    mongooseQuery = mongooseQuery.select(fields); // Correct usage
-  } else {
-    // If no fields are specified, exclude unwanted fields
-    mongooseQuery = mongooseQuery.select(removeAttr);
-  }
-
-  // Sorting
-  if (req.query.sort) {
-    const sortBy = req.query.sort
-      .split(",")
-      .map((field) => field.trim()) // Trim whitespace
-      .filter((field) => field) // Remove empty strings
-      .join(" "); // Join into a single string
-
-    mongooseQuery = mongooseQuery.sort(sortBy);
-  } else {
-    // Default sorting (if needed)
-    mongooseQuery = mongooseQuery.sort("createdAt");
-  }
+  const apiFeature = new ApiFeatuers(ProductModel.find(), req.query)
+    .paginate(await ProductModel.estimatedDocumentCount())
+    .filter()
+    .search()
+    .limitFields()
+    .sort();
 
   // Execute the query
+  const { mongooseQuery, paginationResult } = apiFeature;
   const products = await mongooseQuery.lean(); // Use .lean() for better performance
-
+  console.log("this is the paginatioResult ", paginationResult);
   if (products) {
     res.status(StatusCodes.OK).json({
       message: "Successful",
-      limit: req.pagination.limit,
-      currentPage: req.pagination.page,
-      totalCount: req.pagination.totalCount,
-      totalPages: req.pagination.totalPages,
-      total: products.length,
+      ...paginationResult,
       data: products,
     });
   } else {
@@ -184,31 +153,4 @@ export const deleteProduct = expressAsyncHandler(async (req, res, next) => {
     // handles if the Product id is not found ;
     return next(new ApiError("Product is not found", StatusCodes.NOT_FOUND));
   }
-});
-
-// UTILITY FUNCTIONS :::::
-// APPLY FILTERS :
-
-export const applyFilter = expressAsyncHandler(async (req, res, next) => {
-  // the list of the exculded parameters ;
-  const excludedParameters = ["limit", "size", "page", "sort", "fields"];
-  // Making a deep copy of the req.query object ;
-  let queryObject = { ...req.query };
-  console.log("this is the query object : ", queryObject);
-  // exculded the un-needed parameters from going to the query ;
-  excludedParameters.forEach((element) => delete queryObject[element]);
-
-  // stringfiying the queryObject ;
-  let query = JSON.stringify(queryObject);
-  console.log("this is the query : ", query);
-
-  // Searching for ( greater than ) || (greater than or equal ) || (less than ) || (less than or equal ) ;
-  // to put a dollar sign before them
-  // to execute the query ;
-  query = query.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-  // Parsing the Query String to pass to the mongoose engine ;
-  query = JSON.parse(query);
-
-  req.filter = query;
-  next();
 });

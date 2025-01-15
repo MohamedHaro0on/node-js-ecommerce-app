@@ -20,9 +20,9 @@ import paginateForGetRequests from "../../../middleswares/pagination.js";
 
 const categoryRoutes = express.Router();
 
-categoryRoutes.use((req, res, next) =>
-  paginateForGetRequests(req, res, next, CategoryModel)
-);
+// categoryRoutes.use((req, res, next) =>
+//   paginateForGetRequests(req, res, next, CategoryModel)
+// );
 
 // Create New Category
 categoryRoutes.post(
@@ -33,7 +33,7 @@ categoryRoutes.post(
 );
 
 // Get All Categories
-categoryRoutes.get("/get-categories", paginate, getCategories);
+categoryRoutes.get("/get-categories", getCategories);
 
 // Get Specfic Category By Name ;
 categoryRoutes.get(

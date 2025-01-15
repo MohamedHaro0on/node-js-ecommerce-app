@@ -3,22 +3,25 @@ import { StatusCodes } from "http-status-codes";
 import SubCategoryModel from "../model/subCategory.model.js";
 import slugify from "slugify";
 import ApiError from "../../../utils/api.error.js";
+import ApiFeatuers from "../../../utils/api.featuers.js";
 
 //          @desc                    get  subcategories ;
 //          @route                   get /subcategories/
 //          @access                  public
 export const getSubCategories = asyncHandler(async (req, res) => {
-  const subcategories = await SubCategoryModel.find({})
-    .skip(req.skip)
-    .limit(req.limit);
-  // .populate({ path: "mainCategoryId", select: "name -_id" });
+  const apiFeatures = new ApiFeatuers(SubCategoryModel.find(), req.query)
+    .filter()
+    .search()
+    .sort()
+    .paginate(await SubCategoryModel.estimatedDocumentCount())
+    .populate({ path: "mainCategoryId", select: "name -_id" });
+
+  const { mongooseQuery, paginationResult } = apiFeatures;
+  const subCategories = await mongooseQuery;
   res.status(StatusCodes.OK).json({
     message: "Sub Categories Fetched Successfully",
-    limit: req.pagination.limit,
-    currentPage: req.pagination.page,
-    totalCount: req.pagination.totalCount,
-    totalPages: req.pagination.totalPages,
-    data: subcategories,
+    ...paginationResult,
+    data: subCategories,
   });
 });
 //          @desc                    get  subcategories ;

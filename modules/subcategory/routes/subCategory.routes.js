@@ -13,6 +13,7 @@ import {
   editSubCategorySchema,
   getSubCategotyByIdSchema,
   deleteSubCategotySchema,
+  getSubCategoriesSchema,
 } from "../joi/subCategory.joi.js";
 import SubCategoryModel from "../model/subCategory.model.js";
 import checkIfExists from "../../../middleswares/check.if.exists.js";
@@ -21,11 +22,11 @@ import paginateForGetRequests from "../../../middleswares/pagination.js";
 
 const SubCategoryRoutes = Router();
 
-// Custom middleware to apply paginate only to GET requests
-SubCategoryRoutes.use((req, res, next) =>
-  paginateForGetRequests(req, res, next, CategoryModel)
-);
-SubCategoryRoutes.use(paginateForGetRequests);
+// // Custom middleware to apply paginate only to GET requests
+// SubCategoryRoutes.use((req, res, next) =>
+//   paginateForGetRequests(req, res, next, CategoryModel)
+// );
+// SubCategoryRoutes.use(paginateForGetRequests);
 
 SubCategoryRoutes.post(
   "/create-subcategory",
@@ -33,6 +34,11 @@ SubCategoryRoutes.post(
   checkIfExists(CategoryModel, "mainCategoryId", "_id", true),
   // checkIfExists(SubCategoryModel, "name", "name", false),
   createSubCategory
+);
+SubCategoryRoutes.get(
+  "/get-subcategories",
+  validateRequest(getSubCategoriesSchema),
+  getSubCategories
 );
 SubCategoryRoutes.put(
   "/edit-subcategory",
