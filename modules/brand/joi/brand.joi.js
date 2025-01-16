@@ -38,7 +38,7 @@ export const editBrandSchema = {
 };
 
 export const deleteBrandSchema = {
-  params: Joi.object()
+  query: Joi.object()
     .required()
     .keys({
       id: objectId().required().messages({

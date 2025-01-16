@@ -18,21 +18,16 @@ import {
 import SubCategoryModel from "../model/subCategory.model.js";
 import checkIfExists from "../../../middleswares/check.if.exists.js";
 import CategoryModel from "../../category/model/category.model.js";
-import paginateForGetRequests from "../../../middleswares/pagination.js";
+import slugifyMiddleWare from "../../../middleswares/slugifiy.js";
 
 const SubCategoryRoutes = Router();
-
-// // Custom middleware to apply paginate only to GET requests
-// SubCategoryRoutes.use((req, res, next) =>
-//   paginateForGetRequests(req, res, next, CategoryModel)
-// );
-// SubCategoryRoutes.use(paginateForGetRequests);
 
 SubCategoryRoutes.post(
   "/create-subcategory",
   validateRequest(createSubCategotySchema),
   checkIfExists(CategoryModel, "mainCategoryId", "_id", true),
   // checkIfExists(SubCategoryModel, "name", "name", false),
+  slugifyMiddleWare,
   createSubCategory
 );
 SubCategoryRoutes.get(
@@ -43,8 +38,9 @@ SubCategoryRoutes.get(
 SubCategoryRoutes.put(
   "/edit-subcategory",
   validateRequest(editSubCategorySchema),
-  checkIfExists(CategoryModel, "categoryId", "_id", true),
-  checkIfExists(SubCategoryModel, "subCategoryId", "_id", true),
+  checkIfExists(CategoryModel, "mainCategoryId", "_id", true),
+  checkIfExists(SubCategoryModel, "id", "_id", true),
+  slugifyMiddleWare,
   editSubCategory
 );
 SubCategoryRoutes.get("/get-subcategories", paginate, getSubCategories);

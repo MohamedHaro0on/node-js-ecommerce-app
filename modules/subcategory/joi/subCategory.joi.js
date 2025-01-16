@@ -1,5 +1,6 @@
 import Joi from "joi";
 import joiObjectId from "joi-objectid";
+import checkIfNewSubCategoryExists from "../../../utils/joi.external.functions/check.new.sub.category.exists.js";
 const objectId = joiObjectId(Joi); // Initialize joi-objectid
 
 const fieldsAttribute = [
@@ -16,13 +17,18 @@ export const createSubCategotySchema = {
   body: Joi.object()
     .required()
     .keys({
-      name: Joi.string().required().min(3).max(20).messages({
-        "string.base": "Name must be a string",
-        "string.empty": "Name is required",
-        "string.min": "Name must be at least 3 characters long",
-        "string.max": "Name must not exceed 20 characters",
-        "any.required": "Name is required",
-      }),
+      name: Joi.string()
+        .required()
+        .min(3)
+        .max(20)
+        .external(checkIfNewSubCategoryExists)
+        .messages({
+          "string.base": "Name must be a string",
+          "string.empty": "Name is required",
+          "string.min": "Name must be at least 3 characters long",
+          "string.max": "Name must not exceed 20 characters",
+          "any.required": "Name is required",
+        }),
       mainCategoryId: objectId().required().messages({
         "string.base": "Category ID must be a string",
         "string.empty": "Category ID is required",
@@ -33,27 +39,40 @@ export const createSubCategotySchema = {
 };
 
 export const editSubCategorySchema = {
+  query: Joi.object()
+    .required()
+    .keys({
+      id: objectId().required().messages({
+        "string.base": "Sub Category ID must be a string",
+        "string.empty": "Sub Category ID is required",
+        "any.required": "Sub Category ID is required",
+        "string.pattern.name":
+          "Sub Category ID must be a valid MongoDB ObjectId",
+      }),
+    }),
   body: Joi.object()
     .required()
     .keys({
-      name: Joi.string().required().min(3).max(20).messages({
-        "string.base": "Name must be a string",
-        "string.empty": "Name is required",
-        "string.min": "Name must be at least 3 characters long",
-        "string.max": "Name must not exceed 20 characters",
-        "any.required": "Name is required",
-      }),
-      categoryId: objectId().required().messages({
-        "string.base": "Category ID must be a string",
-        "string.empty": "Category ID is required",
-        "any.required": "Category ID is required",
-        "string.pattern.name": "Category ID must be a valid MongoDB ObjectId",
-      }),
-      subCategoryId: objectId().required().messages({
-        "string.base": "Category ID must be a string",
-        "string.empty": "Category ID is required",
-        "any.required": "Category ID is required",
-        "string.pattern.name": "Category ID must be a valid MongoDB ObjectId",
+      name: Joi.string()
+        .required()
+        .min(3)
+        .max(20)
+        .external(checkIfNewSubCategoryExists)
+        .messages({
+          "any.base": "Name must be a string",
+          "any.empty": "Name is required",
+          "any.min": "Name must be at least 3 characters long",
+          "any.max": "Name must not exceed 20 characters",
+          "any.required": "Name is required",
+          "any.invalid":
+            "There is a sub Category with the same name inside the category",
+        }),
+      mainCategoryId: objectId().required().messages({
+        "string.base": "mainCategoryId ID must be a string",
+        "string.empty": "mainCategoryId ID is required",
+        "any.required": "mainCategoryId ID is required",
+        "string.pattern.name":
+          "mainCategoryId ID must be a valid MongoDB ObjectId",
       }),
     }),
 };

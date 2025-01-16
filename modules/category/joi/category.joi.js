@@ -17,7 +17,7 @@ export const createCategorySchema = {
 };
 
 export const editCategorySchema = {
-  body: Joi.object()
+  query: Joi.object()
     .required()
     .keys({
       id: objectId().required().messages({
@@ -26,6 +26,10 @@ export const editCategorySchema = {
         "any.required": "Category ID is required",
         "string.pattern.name": "Category ID must be a valid MongoDB ObjectId",
       }),
+    }),
+  body: Joi.object()
+    .required()
+    .keys({
       image: Joi.string(),
       name: Joi.string().required().min(3).max(20).messages({
         "string.base": "Name must be a string",

@@ -4,26 +4,20 @@ const CheckSubCategoriesExists = async (subCategoryIds, helper) => {
   try {
     if (subCategoryIds) {
       const subCategories = await SubCategoryModel.find({
-        _id: { $exists: true, $in: subCategoryIds },
+        _id: { $in: subCategoryIds },
       });
 
-      if (
-        subCategories.length === 0 ||
-        subCategories.length != subCategoryIds.length
-      ) {
-        // If the subcategories are not found, return an error
-        return helper.error("any.invalid", {
-          subCategoryIds,
-          message: `Invalid Sub Category ids`,
-        });
+      // Check if all subCategoryIds exist in the database
+      if (subCategories.length !== subCategoryIds.length) {
+        throw new Error("Invalid Sub Category IDs");
       }
-      console.log("this was successfull ");
+
+      console.log("This was successful");
       return subCategoryIds;
     }
   } catch (e) {
-    return helper.error("any.invalid", {
-      message: `${e}`,
-    });
+    // Throw the error to ensure it is propagated
+    throw new Error(e.message);
   }
 };
 

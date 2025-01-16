@@ -22,7 +22,7 @@ const checkIfExists = (Model, reqAttr, schemaAttr, shouldExist) => {
       // Object exists but shouldn't ;
       return next(
         new ApiError(
-          `${Model.name} with ${schemaAttr} = ${identifier}  is already created `,
+          `${Model.modelName} with ${schemaAttr} = ${identifier}  is already created `,
           StatusCodes.BAD_REQUEST
         )
       );
@@ -30,7 +30,7 @@ const checkIfExists = (Model, reqAttr, schemaAttr, shouldExist) => {
       // "Object does not exist but should";
       return next(
         new ApiError(
-          `${Model.name} with ${schemaAttr} = ${identifier} is not found `,
+          `${Model.modelName} with ${schemaAttr} = ${identifier} is not found `,
           StatusCodes.BAD_REQUEST
         )
       );

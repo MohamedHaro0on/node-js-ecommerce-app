@@ -4,6 +4,11 @@ import slugify from "slugify";
 import ProductModel from "../model/product.model.js";
 import ApiError from "../../../utils/api.error.js";
 import ApiFeatuers from "../../../utils/api.featuers.js";
+import deleteHandler from "../../../utils/handlers/delete.handler.js";
+import GetByIdHandler from "../../../utils/handlers/get.by.id.handler.js";
+import updateHandler from "../../../utils/handlers/update.handler.js";
+import GetHandler from "../../../utils/handlers/get.handler.js";
+import createHandler from "../../../utils/handlers/create.handler.js";
 
 const removeAttr = "-createdAt -updatedAt -__v";
 const getFullInfo = [
@@ -14,143 +19,29 @@ const getFullInfo = [
 //          @desc                    Create Product
 //          @route                   POST  /create-product
 //          @access                  private
-export const createProduct = expressAsyncHandler(async (req, res) => {
-  req.body.slug = slugify(req.body.name);
-  const newProduct = await ProductModel.create(req.body);
-  if (newProduct)
-    res.status(StatusCodes.CREATED).json({
-      message: "Success",
-      data: newProduct,
-    });
-  else
-    return next(
-      new ApiError(
-        "Can't Create a new Product ",
-        StatusCodes.INSUFFICIENT_SPACE_ON_RESOURCE
-      )
-    );
-});
+export const createProduct = createHandler(ProductModel);
 
 //          @desc                    Get Products
 //          @route                   GET   /get-products
 //          @access                      public
 
-export const getProducts = expressAsyncHandler(async (req, res, next) => {
-  // Base query
-  const apiFeature = new ApiFeatuers(ProductModel.find(), req.query)
-    .paginate(await ProductModel.estimatedDocumentCount())
-    .filter()
-    .search()
-    .limitFields()
-    .sort();
-
-  // Execute the query
-  const { mongooseQuery, paginationResult } = apiFeature;
-  const products = await mongooseQuery.lean(); // Use .lean() for better performance
-  console.log("this is the paginatioResult ", paginationResult);
-  if (products) {
-    res.status(StatusCodes.OK).json({
-      message: "Successful",
-      ...paginationResult,
-      data: products,
-    });
-  } else {
-    next(
-      new ApiError("There are no products to display", StatusCodes.NO_CONTENT)
-    );
-  }
-});
+export const getProducts = GetHandler(ProductModel, getFullInfo);
 
 //          @desc                    get specfic Product by ID  ;
 //          @route                   GET /get-product
 //          @access                  public
-export const getProductById = expressAsyncHandler(async (req, res, next) => {
-  const { id } = req.query;
-  let product = await ProductModel.findById(id)
-    .populate(getFullInfo)
-    .select(removeAttr);
-  //if Product was not found :
-  if (product) {
-    res.status(StatusCodes.OK).json({
-      message: "Successfll",
-      data: product,
-    });
-  }
-  //if Product is not found :
-  return next(new ApiError("Product is not found", StatusCodes.NOT_FOUND));
-});
+//    .populate(getFullInfo)
 
-//          @desc                    get  Products  by Name ;
-//          @route                   GET /get-product
-//          @access                  public
-export const getProductsByName = expressAsyncHandler(async (req, res, next) => {
-  const { name } = req.query;
-  let products = await ProductModel.find({ name })
-    .populate(getFullInfo)
-    .select(removeAttr);
-  //if Product was not found :
-  if (products && products.length > 0) {
-    res.status(StatusCodes.OK).json({
-      message: "Successfull",
-      limit: req.pagination.limit,
-      currentPage: req.pagination.page,
-      totalCount: req.pagination.totalCount,
-      totalPages: req.pagination.totalPages,
-      data: products,
-      total: products.length,
-    });
-  } else {
-    //if Product is not found :
-    return next(
-      new ApiError(
-        `There are no products with name : ${name}`,
-        StatusCodes.NOT_FOUND
-      )
-    );
-  }
-});
+export const getProductById = GetByIdHandler(ProductModel, getFullInfo);
 
 //          @desc                        Update specfic Product
 //          @route                       PUT         /update-product
 //          @access                      Private
 
-export const updateProduct = expressAsyncHandler(async (req, res, next) => {
-  if (req.body.title) {
-    req.body.slug = slugify(req.body.name);
-  }
-  const { id } = req.query;
-
-  const product = await ProductModel.findByIdAndUpdate({ _id: id }, req.body, {
-    new: true,
-  })
-    .populate(getFullInfo)
-    .select(removeAttr);
-  if (product) {
-    res.status(StatusCodes.ACCEPTED).json({
-      message: "Succesfull",
-      data: product,
-    });
-  } else {
-    // handles if the Product id is not found ;
-    return next(new ApiError("Product is not found", StatusCodes.NOT_FOUND));
-  }
-});
+export const updateProduct = updateHandler(ProductModel);
 
 //          @desc                        Delete specfic Product
 //          @route                       Delete         /update-product
 //          @access                      Private
 
-export const deleteProduct = expressAsyncHandler(async (req, res, next) => {
-  const { id } = req.query;
-
-  const deletedProduct = await ProductModel.findByIdAndDelete({ _id: id });
-  if (deletedProduct) {
-    res.status(StatusCodes.OK).json({
-      message: "Product Found and was Deleted",
-      data: deletedProduct,
-    });
-  } else {
-    // handles if the Product id is not found ;
-    return next(new ApiError("Product is not found", StatusCodes.NOT_FOUND));
-  }
-});
+export const deleteProduct = deleteHandler(ProductModel);

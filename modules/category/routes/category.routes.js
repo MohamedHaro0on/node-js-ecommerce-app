@@ -6,7 +6,6 @@ import {
   deleteCategory,
   getCategory,
 } from "../controller/category.controller.js";
-import paginate from "../../../middleswares/pagination.js";
 import validateRequest from "../../../middleswares/validate.request.js";
 import {
   createCategorySchema,
@@ -16,19 +15,16 @@ import {
 } from "../joi/category.joi.js";
 import checkIfExists from "../../../middleswares/check.if.exists.js";
 import CategoryModel from "../model/category.model.js";
-import paginateForGetRequests from "../../../middleswares/pagination.js";
+import slugifyMiddleWare from "../../../middleswares/slugifiy.js";
 
 const categoryRoutes = express.Router();
-
-// categoryRoutes.use((req, res, next) =>
-//   paginateForGetRequests(req, res, next, CategoryModel)
-// );
 
 // Create New Category
 categoryRoutes.post(
   "/create-category",
   validateRequest(createCategorySchema),
   checkIfExists(CategoryModel, "name", "name", false),
+  slugifyMiddleWare,
   createCategory
 );
 

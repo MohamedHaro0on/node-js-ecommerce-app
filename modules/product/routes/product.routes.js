@@ -4,9 +4,7 @@ import {
   getProducts,
   updateProduct,
   deleteProduct,
-  // getProductsByName,
   getProductById,
-  // applyFilter,
 } from "../controller/product.controller.js";
 import validateRequest from "../../../middleswares/validate.request.js";
 import {
@@ -18,6 +16,7 @@ import {
 } from "../joi/product.joi.js";
 import checkIfExists from "../../../middleswares/check.if.exists.js";
 import ProductModel from "../model/product.model.js";
+import slugifyMiddleWare from "../../../middleswares/slugifiy.js";
 
 const productRoutes = express.Router();
 
@@ -31,6 +30,7 @@ const productRoutes = express.Router();
 productRoutes.post(
   "/create-product",
   validateRequest(createProductSchema),
+  slugifyMiddleWare,
   createProduct
 );
 
@@ -41,13 +41,6 @@ productRoutes.get(
   // applyFilter,
   getProducts
 );
-
-// // Get Specfic Products By Name ;
-// productRoutes.get(
-//   "/get-products-by-name",
-//   validateRequest(getProductsByNameSchema),
-//   getProductsByName
-// );
 
 // Get Specfic Product By Id ;
 productRoutes.get(
@@ -61,6 +54,7 @@ productRoutes.put(
   "/update-product",
   checkIfExists(ProductModel, "id", "_id", true),
   validateRequest(editProductSchema),
+  slugifyMiddleWare,
   updateProduct
 );
 

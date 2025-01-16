@@ -128,15 +128,12 @@ export const deleteProductSchema = {
   query: Joi.object()
     .required()
     .keys({
-      id: objectId()
-        .required()
-
-        .messages({
-          "string.base": "Product ID must be a string",
-          "string.empty": "Product ID is required",
-          "any.required": "Product ID is required",
-          "string.pattern.name": "Product ID must be a valid MongoDB ObjectId",
-        }),
+      id: objectId().required().messages({
+        "string.base": "Product ID must be a string",
+        "string.empty": "Product ID is required",
+        "any.required": "Product ID is required",
+        "string.pattern.name": "Product ID must be a valid MongoDB ObjectId",
+      }),
     }),
 };
 

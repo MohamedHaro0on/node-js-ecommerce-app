@@ -96,7 +96,9 @@ class ApiFeatuers {
     const page = parseInt(this.reqQueryObject.page) || 1;
     const limit = parseInt(size);
     const skip = (parseInt(page) - 1) * limit;
-    const totalPages = Math.ceil(totalCount / limit);
+    const totalPages = Math.ceil(totalCount / limit)
+      ? Math.ceil(totalCount / limit)
+      : 1;
     const pagination = {
       limit,
       skip,
@@ -108,10 +110,14 @@ class ApiFeatuers {
     this.paginationResult = pagination;
     return this;
   };
-  populate(object) {
+  populate = (object) => {
     this.mongooseQuery = this.mongooseQuery.populate(object);
     return this;
-  }
+  };
+  aggregate = (object) => {
+    this.mongooseQuery = this.mongooseQuery.aggregate(object);
+    return this;
+  };
 }
 
 export default ApiFeatuers;

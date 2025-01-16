@@ -17,28 +17,30 @@ import {
 import checkIfExists from "../../../middleswares/check.if.exists.js";
 import BrandModel from "../model/brand.model.js";
 import paginateForGetRequests from "../../../middleswares/pagination.js";
+import slugifyMiddleWare from "../../../middleswares/slugifiy.js";
 
-const brandRoutes = express.Router();
+const brandRouter = express.Router();
 
 // // Custom middleware to apply paginate only to GET requests
-// brandRoutes.use((req, res, next) =>
+// brandRouter.use((req, res, next) =>
 //   paginateForGetRequests(req, res, next, BrandModel)
 // );
-// brandRoutes.use(paginateForGetRequests);
+// brandRouter.use(paginateForGetRequests);
 
 // Create New Brand
-brandRoutes.post(
+brandRouter.post(
   "/create-brand",
   validateRequest(createBrandSchema),
   checkIfExists(BrandModel, "name", "name", false),
+  slugifyMiddleWare,
   createBrand
 );
 
 // Get All Brands
-brandRoutes.get("/get-brands", getBrands);
+brandRouter.get("/get-brands", getBrands);
 
 // Get Specfic Brand By Id;
-brandRoutes.get(
+brandRouter.get(
   "/get-brand",
   checkIfExists(BrandModel, "id", "_id", true),
   validateRequest(getBrandSchema),
@@ -46,7 +48,7 @@ brandRoutes.get(
 );
 
 // Update Brand ;
-brandRoutes.put(
+brandRouter.put(
   "/update-Brand",
   checkIfExists(BrandModel, "id", "_id", true),
   validateRequest(editBrandSchema),
@@ -54,11 +56,11 @@ brandRoutes.put(
 );
 
 // Delete Brand ;
-brandRoutes.delete(
-  "/delete-Brand/:id",
+brandRouter.delete(
+  "/delete-Brand",
   validateRequest(deleteBrandSchema),
   checkIfExists(BrandModel, "id", "_id", true),
   deleteBrand
 );
 
-export default brandRoutes;
+export default brandRouter;
