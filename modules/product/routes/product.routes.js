@@ -18,16 +18,16 @@ import checkIfExists from "../../../middleswares/check.if.exists.js";
 import ProductModel from "../model/product.model.js";
 import slugifyMiddleWare from "../../../middleswares/slugifiy.js";
 
-const productRoutes = express.Router();
+const productRouter = express.Router();
 
 // // Custom middleware to apply paginate only to GET requests
-// productRoutes.use((req, res, next) =>
+// productRouter.use((req, res, next) =>
 //   paginateForGetRequests(req, res, next, ProductModel)
 // );
-// productRoutes.use(paginateForGetRequests);
+// productRouter.use(paginateForGetRequests);
 
 // Create New Product
-productRoutes.post(
+productRouter.post(
   "/create-product",
   validateRequest(createProductSchema),
   slugifyMiddleWare,
@@ -35,22 +35,21 @@ productRoutes.post(
 );
 
 // Get All products
-productRoutes.get(
+productRouter.get(
   "/get-products",
   validateRequest(getProductsSchema),
-  // applyFilter,
   getProducts
 );
 
 // Get Specfic Product By Id ;
-productRoutes.get(
+productRouter.get(
   "/get-product",
   validateRequest(getProductByIdSchema),
   getProductById
 );
 
 // Update Product ;
-productRoutes.put(
+productRouter.put(
   "/update-product",
   checkIfExists(ProductModel, "id", "_id", true),
   validateRequest(editProductSchema),
@@ -59,11 +58,11 @@ productRoutes.put(
 );
 
 // Delete Product ;
-productRoutes.delete(
+productRouter.delete(
   "/delete-product",
   validateRequest(deleteProductSchema),
   checkIfExists(ProductModel, "id", "_id", true),
   deleteProduct
 );
 
-export default productRoutes;
+export default productRouter;

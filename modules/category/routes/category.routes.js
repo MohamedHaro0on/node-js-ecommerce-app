@@ -17,10 +17,10 @@ import checkIfExists from "../../../middleswares/check.if.exists.js";
 import CategoryModel from "../model/category.model.js";
 import slugifyMiddleWare from "../../../middleswares/slugifiy.js";
 
-const categoryRoutes = express.Router();
+const categoryRouter = express.Router();
 
 // Create New Category
-categoryRoutes.post(
+categoryRouter.post(
   "/create-category",
   validateRequest(createCategorySchema),
   checkIfExists(CategoryModel, "name", "name", false),
@@ -29,10 +29,10 @@ categoryRoutes.post(
 );
 
 // Get All Categories
-categoryRoutes.get("/get-categories", getCategories);
+categoryRouter.get("/get-categories", getCategories);
 
 // Get Specfic Category By Name ;
-categoryRoutes.get(
+categoryRouter.get(
   "/get-category",
   validateRequest(getCategorySchema),
   checkIfExists(CategoryModel, "id", "_id", true),
@@ -40,7 +40,7 @@ categoryRoutes.get(
 );
 
 // Update Category ;
-categoryRoutes.put(
+categoryRouter.put(
   "/update-category",
   checkIfExists(CategoryModel, "id", "_id", true),
   validateRequest(editCategorySchema),
@@ -48,11 +48,11 @@ categoryRoutes.put(
 );
 
 // Delete Category ;
-categoryRoutes.delete(
+categoryRouter.delete(
   "/delete-category/:id",
   validateRequest(deleteCategorySchema),
   checkIfExists(CategoryModel, "id", "_id", true),
   deleteCategory
 );
 
-export default categoryRoutes;
+export default categoryRouter;

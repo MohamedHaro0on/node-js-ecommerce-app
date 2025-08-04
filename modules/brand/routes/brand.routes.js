@@ -16,7 +16,6 @@ import {
 } from "../joi/brand.joi.js";
 import checkIfExists from "../../../middleswares/check.if.exists.js";
 import BrandModel from "../model/brand.model.js";
-import paginateForGetRequests from "../../../middleswares/pagination.js";
 import slugifyMiddleWare from "../../../middleswares/slugifiy.js";
 
 const brandRouter = express.Router();

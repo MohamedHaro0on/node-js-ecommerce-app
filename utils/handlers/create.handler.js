@@ -4,12 +4,11 @@ import expressAsyncHandler from "express-async-handler";
 
 const createHandler = (Model) =>
   expressAsyncHandler(async (req, res, next, error) => {
-    const updatedDocument = await Model.create(req.body);
+    const createdDocument = await Model.create(req.body);
 
-    if (updatedDocument) {
+    if (createdDocument) {
       return res.status(StatusCodes.OK).json({
         message: `${Model.modelName} Created Succefully successfully`,
-        data: updatedDocument,
       });
     }
 

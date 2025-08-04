@@ -3,12 +3,12 @@ import { config } from "dotenv";
 import morgan from "morgan";
 import DBconnection from "./configurations/config.js";
 import categoryRouter from "./modules/category/routes/category.routes.js";
-import ProductRoutes from "./modules/product/routes/product.routes.js";
+import ProductRouter from "./modules/product/routes/product.routes.js";
 import errorHandler from "./handlers/error.handler.js";
 import routeNotImplementedHandler from "./handlers/notImplementedRoute.handler.js";
-import SubCategoryRoutes from "./modules/subcategory/routes/subCategory.routes.js";
+import SubCategoryRouter from "./modules/subcategory/routes/subCategory.routes.js";
 import brandRouter from "./modules/brand/routes/brand.routes.js";
-import userRouter from "./modules/users/routes/user.routes.js";
+import userRouter from "./modules/user/routes/user.routes.js";
 
 const app = express();
 
@@ -27,8 +27,8 @@ if (process.env.NODE_ENV === "development") {
 
 // Routes :
 app.use("/categories/", categoryRouter);
-app.use("/products/", ProductRoutes);
-app.use("/sub-categories", SubCategoryRoutes);
+app.use("/products/", ProductRouter);
+app.use("/sub-categories", SubCategoryRouter);
 app.use("/brands/", brandRouter);
 app.use("/users/", userRouter);
 // Not implemented Errors :

@@ -20,9 +20,9 @@ import checkIfExists from "../../../middleswares/check.if.exists.js";
 import CategoryModel from "../../category/model/category.model.js";
 import slugifyMiddleWare from "../../../middleswares/slugifiy.js";
 
-const SubCategoryRoutes = Router();
+const SubCategoryRouter = Router();
 
-SubCategoryRoutes.post(
+SubCategoryRouter.post(
   "/create-subcategory",
   validateRequest(createSubCategotySchema),
   checkIfExists(CategoryModel, "mainCategoryId", "_id", true),
@@ -30,12 +30,12 @@ SubCategoryRoutes.post(
   slugifyMiddleWare,
   createSubCategory
 );
-SubCategoryRoutes.get(
+SubCategoryRouter.get(
   "/get-subcategories",
   validateRequest(getSubCategoriesSchema),
   getSubCategories
 );
-SubCategoryRoutes.put(
+SubCategoryRouter.put(
   "/edit-subcategory",
   validateRequest(editSubCategorySchema),
   checkIfExists(CategoryModel, "mainCategoryId", "_id", true),
@@ -43,18 +43,18 @@ SubCategoryRoutes.put(
   slugifyMiddleWare,
   editSubCategory
 );
-SubCategoryRoutes.get("/get-subcategories", paginate, getSubCategories);
-SubCategoryRoutes.get(
+SubCategoryRouter.get("/get-subcategories", paginate, getSubCategories);
+SubCategoryRouter.get(
   "/get-subcategory/:id",
   validateRequest(getSubCategotyByIdSchema),
   checkIfExists(SubCategoryModel, "id", "_id", true),
   getSubCategotyById
 );
 
-SubCategoryRoutes.delete(
+SubCategoryRouter.delete(
   "/delete-subcategory/:id",
   validateRequest(deleteSubCategotySchema),
   checkIfExists(SubCategoryModel, "id", "_id", true),
   deleteSubCategory
 );
-export default SubCategoryRoutes;
+export default SubCategoryRouter;

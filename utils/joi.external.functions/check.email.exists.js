@@ -1,4 +1,4 @@
-import UserModel from "../../modules/users/model/user.model.js";
+import UserModel from "../../modules/user/model/user.model.js";
 
 const checkIfEmailExists = async (email, helper) => {
   try {

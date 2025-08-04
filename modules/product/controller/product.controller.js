@@ -1,9 +1,4 @@
-import expressAsyncHandler from "express-async-handler";
-import { StatusCodes } from "http-status-codes";
-import slugify from "slugify";
 import ProductModel from "../model/product.model.js";
-import ApiError from "../../../utils/api.error.js";
-import ApiFeatuers from "../../../utils/api.featuers.js";
 import deleteHandler from "../../../utils/handlers/delete.handler.js";
 import GetByIdHandler from "../../../utils/handlers/get.by.id.handler.js";
 import updateHandler from "../../../utils/handlers/update.handler.js";
@@ -19,6 +14,7 @@ const getFullInfo = [
 //          @desc                    Create Product
 //          @route                   POST  /create-product
 //          @access                  private
+//          @params   
 export const createProduct = createHandler(ProductModel);
 
 //          @desc                    Get Products
